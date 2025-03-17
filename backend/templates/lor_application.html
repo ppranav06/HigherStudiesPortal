@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Higher Studies Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: white;
+        }
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background-color: #0056b3; /* SSN Blue */
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .sidebar img {
+            width: 100px;
+            margin-bottom: 15px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: top;
+            /* font-size: 70px; */
+        }
+        /* Apply Button */
+        .apply-btn {
+            background-color: #0056b3; /* SSN Blue */
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .apply-btn:hover {
+            background-color: #004494;
+        }
+        /* Header Bar */
+        .header {
+            width: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 2px solid #ddd;
+        }
+        .header .title {
+            font-size: 50px;
+            color: #0056b3;
+            font-weight: bold;
+        }
+        .header .profile {
+            color: #0056b3;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <img src="ssn.png" alt="SSN Logo">
+        <a href="#">LoR Tracking</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="title">Higher Studies Portal</div>
+            <!-- <div class="profile">💼 alamelu2111021@ssn.edu.in</div> -->
+        </div>
+        
+        <button class="apply-btn">Apply for LoR</button>
+    </div>
+
+</body>
+</html>
