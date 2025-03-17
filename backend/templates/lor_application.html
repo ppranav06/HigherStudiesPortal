@@ -19,7 +19,7 @@
         /* Sidebar Styling */
         .sidebar {
             width: 250px;
-            background-color: #0056b3; /* SSN Blue */
+            background-color: #003C88; /* SSN Blue */
             padding: 20px;
             color: white;
             display: flex;
@@ -27,9 +27,10 @@
             gap: 15px;
         }
         .sidebar img {
-            width: 100px;
-            margin-bottom: 15px;
-        }
+        width: 100%;
+        max-width: 200px; 
+        display: block;
+        margin: 0 auto; }
         .sidebar a {
             text-decoration: none;
             color: white;
@@ -50,11 +51,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: top;
-            /* font-size: 70px; */
         }
         /* Apply Button */
         .apply-btn {
-            background-color: #0056b3; /* SSN Blue */
+            background-color: #003C88; 
             justify-content: center;
             color: white;
             font-size: 20px;
@@ -64,7 +64,7 @@
             cursor: pointer;
         }
         .apply-btn:hover {
-            background-color: #004494;
+            background-color: #003C88;
         }
         /* Header Bar */
         .header {
@@ -78,11 +78,11 @@
         }
         .header .title {
             font-size: 50px;
-            color: #0056b3;
+            color: #003C88;
             font-weight: bold;
         }
         .header .profile {
-            color: #0056b3;
+            color: #003C88;
             font-size: 16px;
         }
     </style>
@@ -92,14 +92,12 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <img src="ssn.png" alt="SSN Logo">
-        <a href="#">LoR Tracking</a>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="header">
-            <div class="title">Higher Studies Portal</div>
-            <!-- <div class="profile">💼 alamelu2111021@ssn.edu.in</div> -->
+            <div class="title">Apply for LoR</div>
         </div>
         
         <button class="apply-btn">Apply for LoR</button>

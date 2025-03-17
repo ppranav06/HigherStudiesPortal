@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty LOR Requests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .sidebar img {
+            width: 100%;
+            max-width: 200px; 
+            display: block;
+            margin: 0 auto; 
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #003C88;
+            padding: 20px;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .content {
+            margin-left: 290px; 
+            padding: 20px;
+            width: calc(100% - 290px);
+        }
+
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #003C88;
+            color: white;
+        }
+
+        .status {
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .pending { background-color: orange; }
+        .verified { background-color: green; }
+        .rejected { background-color: red; }
+
+        select {
+            padding: 6px;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin-left: 10px;
+            background-color: #003C88;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #002760;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <img class="image" src="ssn.png" alt="SSN Logo">
+        <!-- <h2>Faculty Dashboard</h2> -->
+    </div>
+    <div class="content">
+        <h1>Student LOR Requests</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody id="lorRequests">
+                <tr>
+                    <td>John Doe</td>
+                    <td>2023001</td>
+                    <td><span class="status pending">Pending</span></td>
+                    <td>
+                        <select>
+                            <option value="pending">Pending</option>
+                            <option value="verified">Verified</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <button onclick="updateStatus(this)">Update</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>2023002</td>
+                    <td><span class="status verified">Verified</span></td>
+                    <td>
+                        <select>
+                            <option value="pending">Pending</option>
+                            <option value="verified" selected>Verified</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <button onclick="updateStatus(this)">Update</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function updateStatus(button) {
+            let row = button.parentElement.parentElement;
+            let statusCell = row.cells[2].querySelector(".status");
+            let select = button.previousElementSibling;
+            let newStatus = select.value;
+
+            statusCell.className = "status " + newStatus;
+            statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+        }
+    </script>
+</body>
+</html>
