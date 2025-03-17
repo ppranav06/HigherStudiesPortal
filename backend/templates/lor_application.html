@@ -11,25 +11,29 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
+        
         body {
             display: flex;
             height: 100vh;
-            background-color: white;
+            background-color: #f0f0f0;
         }
+        
         /* Sidebar Styling */
         .sidebar {
             width: 250px;
-            background-color: #0056b3; /* SSN Blue */
+            background-color: #0056b3;
             padding: 20px;
             color: white;
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
+        
         .sidebar img {
             width: 100px;
             margin-bottom: 15px;
         }
+        
         .sidebar a {
             text-decoration: none;
             color: white;
@@ -40,32 +44,21 @@
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
         }
+        
         .sidebar a:hover {
             background-color: rgba(255, 255, 255, 0.4);
         }
+        
         /* Main Content */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: top;
-            /* font-size: 70px; */
+            justify-content: start;
+            padding: 20px;
         }
-        /* Apply Button */
-        .apply-btn {
-            background-color: #0056b3; /* SSN Blue */
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .apply-btn:hover {
-            background-color: #004494;
-        }
+        
         /* Header Bar */
         .header {
             width: 100%;
@@ -76,34 +69,143 @@
             padding: 15px 30px;
             border-bottom: 2px solid #ddd;
         }
+        
         .header .title {
             font-size: 50px;
             color: #0056b3;
             font-weight: bold;
         }
-        .header .profile {
-            color: #0056b3;
+        
+        /* Dropdown Button */
+        .dropbtn {
+            background-color: #0221cd;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .dropbtn:hover, .dropbtn:focus {
+            background-color: #0218a7;
+        }
+        
+        /* Dropdown Content */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f6f6f6;
+            min-width: 230px;
+            border: 1px solid #ddd;
+            z-index: 1;
+        }
+        
+        .dropdown-content input {
+            box-sizing: border-box;
             font-size: 16px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+        
+        .show {
+            display: block;
+        }
+        
+        /* Apply Button */
+        .apply-btn {
+            background-color: #0056b3;
+            color: white;
+            font-size: 20px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .apply-btn:hover {
+            background-color: #004494;
         }
     </style>
 </head>
 <body>
-
     <!-- Sidebar -->
     <div class="sidebar">
         <img src="ssn.png" alt="SSN Logo">
         <a href="#">LoR Tracking</a>
     </div>
-
+    
     <!-- Main Content -->
     <div class="main-content">
         <div class="header">
             <div class="title">Higher Studies Portal</div>
-            <!-- <div class="profile">💼 alamelu2111021@ssn.edu.in</div> -->
+        </div>
+        
+        <!-- Dropdown for Staff Selection -->
+        <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn">Select Staff</button>
+            <div id="myDropdown" class="dropdown-content">
+                <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+                <a href="#" data-value="Mr.Kesavan">Kesavan</a>
+                <a href="#" data-value="Mr.Yugesh">Yugesh</a>
+                <a href="#" data-value="Mr.Gopal">Gopal</a>
+                <a href="#" data-value="Mr.Abhishek">Abhishek</a>
+                <a href="#" data-value="Mr.Suresh">Suresh</a>
+                <a href="#" data-value="Mr.Rajesh">Rajesh</a>
+            </div>
         </div>
         
         <button class="apply-btn">Apply for LoR</button>
     </div>
-
+    
+    <script>
+        function myFunction() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+        
+        function filterFunction() {
+            var input, filter, div, a, i;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            div = document.getElementById("myDropdown");
+            a = div.getElementsByTagName("a");
+            for (i = 0; i < a.length; i++) {
+                txtValue = a[i].textContent || a[i].innerText;
+                a[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+        
+        window.onclick = function(event) {
+            if (!event.target.matches(".dropbtn")) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains("show")) {
+                        openDropdown.classList.remove("show");
+                    }
+                }
+            }
+        };
+    </script>
 </body>
 </html>
