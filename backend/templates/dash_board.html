@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Higher Studies Portal</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #003C88;
+            color: white;
+            height: 100vh;
+            padding-top: 20px;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            padding: 15px;
+            cursor: pointer;
+            padding-left: 30px;
+        }
+        .sidebar ul li:hover {
+            background-color: #0056b3;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            border-bottom: 2px solid #003C88;
+        }
+        .sidebar img {
+        width: 100%; /* Makes the image fit the width of the sidebar */
+        max-width: 200px; /* Adjust max width as needed */
+        display: block;
+        margin: 0 auto; /* Centers the image */
+}
+        
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <img class="image" src="ssn.png" alt="SSN Logo">
+        <ul>
+            <li>Home</li>
+            <li>LoR Application</li>
+            <li>LoR Tracking</li>
+            <li>Course Completion Certificate</li>
+        </ul>
+    </div>
+    <div class="content">
+        <div class="header">
+            <!-- <img src="logo.png" alt="SSN Logo"> -->
+            <h2>Higher Studies Portal</h2>
+            <span>user</span>
+        </div>
+        <h1>Welcome to the Higher Studies Portal</h1>
+        <p>Select an option from the menu to proceed.</p>
+    </div>
+</body>
+</html>
