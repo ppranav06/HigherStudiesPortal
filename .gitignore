@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Python environments
-.venv/*
+# Python related
+.venv/
+__pycache__/
