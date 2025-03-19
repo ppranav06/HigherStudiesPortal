@@ -21,6 +21,9 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('lor/', views.lor_application_view, name='lor')
+    path('student/dashboard/', views.dashboard_student, name='Student Dashboard'),
+    path('student/lor/', views.lor_application_student, name='Letter of Recommendation Page'),
+    # Faculty routes
+    path('faculty/dashboard/', views.dashboard_faculty, name='Faculty Dashboard'),
 ]
 
