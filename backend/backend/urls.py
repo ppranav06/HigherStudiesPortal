@@ -15,14 +15,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from . import views
+from django.urls import path, re_path
+from django.views.generic.base import RedirectView
 
+from higherstudiesportal import views
+
+favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 urlpatterns = [
+    path('', views.index, name='index'),
+    # Django admin
     path('admin/', admin.site.urls),
+    # Favicon
+    re_path(r'^favicon\.ico$', favicon_view),
+    # Student Routes
     path('student/dashboard/', views.dashboard_student, name='Student Dashboard'),
     path('student/lor/', views.lor_application_student, name='Letter of Recommendation Page'),
+    path('student/letterUpload', views.letter_upload, name='Admission letter'),
     # Faculty routes
     path('faculty/dashboard/', views.dashboard_faculty, name='Faculty Dashboard'),
 ]
