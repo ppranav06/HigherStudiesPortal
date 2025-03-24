@@ -1,10 +1,13 @@
+{%load static%}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Higher Studies Portal</title>
-    <style>
+    <link rel="stylesheet" href="{% static 'css/common_css.css' %}">
+    <!-- <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -72,18 +75,17 @@
         .header h2{
             font-size: 50px;
         }
-    </style>
+    </style> -->
 </head>
 <body>
     <div class="sidebar">
-        {% load static %}
-        <img class="image" src="{% static 'images/ssn.png' %}" alt="SSN Logo">
+        <img class="image" src="ssn.png" alt="SSN Logo">
         <ul>
             <!-- <li>Home</li> -->
-            <li><a href="f_student_list.html" style="text-decoration: none; color: white"> Student Details</a></li>
-            <li><a href="f_verify.html" style="text-decoration: none; color: white"> Verify </a></li>
-            <!-- <li><a href="cc1.html" style="text-decoration: none; color: white"> Course Completion Certificate </a></li>
-            <li><a href="cc_verification.html" style="text-decoration: none; color: white"> Verification Tracking </a></li> -->
+            <li><a href="lor_application.html" style="text-decoration: none; color: white">LoR Application</a></li>
+            <li><a href="tracking_page.html" style="text-decoration: none; color: white"> LoR Tracking </a></li>
+            <li><a href="cc1.html" style="text-decoration: none; color: white"> Course Completion Certificate </a></li>
+            <li><a href="cc_verification.html" style="text-decoration: none; color: white"> Verification Tracking </a></li>
         </ul>
     </div>
     <div class="content">
