@@ -28,11 +28,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Favicon
     re_path(r'^favicon\.ico$', favicon_view),
+    # Login page
+    path('login/', views.login_view, name='login'),
     # Student Routes
-    path('student/dashboard/', views.dashboard_student, name='Student Dashboard'),
-    path('student/lor/', views.lor_application_student, name='Letter of Recommendation Page'),
-    path('student/letterUpload', views.letter_upload, name='Admission letter'),
+    path('student/dashboard/', views.dashboard_student, name='student_dashboard'),
+    path('student/lor/', views.lor_application_student, name='student_lor'),
+    path('student/lor-tracking/', views.lor_tracking_student, name='student_lor-tracking'),
+    path('student/letter-upload', views.letter_upload, name='student_letter-upload'),
     # Faculty routes
-    path('faculty/dashboard/', views.dashboard_faculty, name='Faculty Dashboard'),
+    path('faculty/dashboard/', views.dashboard_faculty, name='faculty_dashboard'),
 ]
 
