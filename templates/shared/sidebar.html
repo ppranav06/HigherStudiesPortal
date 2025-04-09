@@ -1,0 +1,26 @@
+
+{% load static %}
+
+    <div class="sidebar">
+        {% load static %}
+        <img class="image" src="{% static 'images/ssn.png' %}" alt="SSN Logo">
+        <ul>
+            {% if user.is_authenticated %}
+                {% if user.is_student %}
+                    <!-- <li>Home</li> -->
+                    <li><a href="{% url 'student_lor' %}" style="text-decoration: none; color: white">LoR Application</a></li>
+                    <li><a href="{% url 'student/lor-tracking' %}" style="text-decoration: none; color: white"> LoR Tracking </a></li>
+                    <li><a href="{% url 'student/letter-upload' %}" style="text-decoration: none; color: white"> Course Completion Certificate </a></li>
+                    <li><a href="{% url 'student/lor' %}" style="text-decoration: none; color: white"> Verification Tracking </a></li>
+                {% elif user.is_faculty %}
+                    <!-- <li>Home</li> -->
+                    <li><a href="{% url 'faculty/dashboard' %}" style="text-decoration: none; color: white">Dashboard</a></li>
+                    <li><a href="f_student_list.html" style="text-decoration: none; color: white"> Student Details</a></li>
+                    <li><a href="f_verify.html" style="text-decoration: none; color: white"> Verify </a></li>
+                    <!-- <li><a href="cc1.html" style="text-decoration: none; color: white"> Course Completion Certificate </a></li>
+                    <li><a href="cc_verification.html" style="text-decoration: none; color: white"> Verification Tracking </a></li> -->
+                <!-- {% if user.is_admin %} -->
+                {% endif %}
+            {% endif %}
+        </ul>
+    </div>

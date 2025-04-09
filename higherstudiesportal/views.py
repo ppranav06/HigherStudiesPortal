@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from supabase import create_client, Client
+from dotenv import load_dotenv
 
 # @login_required # enforce after auth is set up
 def lor_application_student(request):
@@ -10,6 +13,7 @@ def lor_tracking_student(request):
     return render(request, 'student/lor_tracking.html')
 
 def dashboard(request):
+    """Returns the dashboard depending upon the type of user"""
     if not request.method == "GET":
         return
     
@@ -27,20 +31,34 @@ def letter_upload(request):
 def index(request):
     return render(request, 'index.html')
 
+@csrf_protect
 def login_view(request):
     if not request.method == "POST":
         return render(request, 'login.html')
 
     # for POST (login method)
-    username = request.POST['username']
+    email = request.POST['email']
     password = request.POST['password']
-    user = authenticate(request, username, password)
+    user = authenticate(request, email, password)
 
     if user is not None:
         login(request, user)
-        return redirect(request.GET.get('next', 'student/dashboard/'))
+        return redirect(request.GET.get('next', '/student/dashboard/'))
     else:
             # Handle invalid credentials
-            return render(request, 'login.html', {'error_message': 'Invalid username or password'})
+            return render(request, 'login.html', {'error_message': 'Invalid email or password'})
     
+def signup_view(request):
+    if not request.method == "POST":
+        return render(request, 'sign-up.html')
+    
+    # for POST (sign-up method)
+    email = request.POST['email']
+    password = request.POST['password']
+    user = authenticate(request, email, password)
 
+    if user is not None:
+        login(request, user)
+    else:
+            # Handle invalid credentials
+            return render(request, 'sign-up.html', {'error_message': 'Invalid email or password'})

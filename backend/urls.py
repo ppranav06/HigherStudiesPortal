@@ -30,6 +30,7 @@ urlpatterns = [
     re_path(r'^favicon\.ico$', favicon_view),
     # Login page
     path('login/', views.login_view, name='login'),
+    path('sign-up/', views.signup_view, name='sign-up'),
     # Student Routes
     path('student/dashboard/', views.dashboard_student, name='student_dashboard'),
     path('student/lor/', views.lor_application_student, name='student_lor'),
