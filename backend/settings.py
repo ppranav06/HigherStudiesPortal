@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from django.apps import apps
+from django.db.models.signals import post_migrate
 
 load_dotenv()
 
@@ -29,7 +31,10 @@ SECRET_KEY = 'django-insecure-bbk8$)cua$c2$xxsxik8(wmw2#q#&s-7194679x^du(0!s4=b0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+]
 
 
 # Application definition
@@ -52,6 +57,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'higherstudiesportal.utils.supabase_auth.SupabaseAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -86,7 +96,10 @@ DATABASES = {
         "PASSWORD": os.environ.get("password") ,
         "HOST": os.environ.get("host") ,
         "PORT": os.environ.get("port") ,
-    } 
+        # "OPTIONS": {
+        #     "options": "-c search_path=django"
+        # },
+    }
 }
 
 
@@ -135,3 +148,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_DIRS=[
     BASE_DIR / "static",
 ]
+
+# def skip_post_migrate(sender, **kwargs):
+#     pass
+
+# post_migrate.disconnect(apps.get_app_config('contenttypes').create_contenttypes, sender=apps.get_app_config('contenttypes'))
+# post_migrate.connect(skip_post_migrate, sender=apps.get_app_config('contenttypes'))

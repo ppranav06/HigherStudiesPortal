@@ -1,40 +1,50 @@
 from django.db import models
-from django.contrib.auth.backends import BaseBackend
-from supabase.client import create_client, Client
-from dotenv import load_dotenv
-import os
+from django.contrib.auth.models import User
 
-class SupabaseClient():
-    def __init__(self):
-        load_dotenv()
-        URL=os.environ.get('SUPABASE_URL')
-        KEY=os.environ.get('SUPABASE_KEY')
-        self.client = create_client(supabase_url=URL, supabase_key=KEY) # supabase client type
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=15, blank=True)
+    department = models.CharField(max_length=100)
+    graduation_year = models.IntegerField()
+    
+    def __str__(self):
+        return self.user.get_full_name()
 
-    def sign_up(self, email, password):
-        user = self.client.auth.sign_up(
-            {
-                'email': email,
-                'password': password
-            }
-        )
-        return user
+class Faculty(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    department = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100)
     
-    def sign_in(self, email, password):
-        user = self.client.sign_in_with_password(
-            {
-                'email': email, 
-                'password': password
-            }
-        )
-        return user
-    
-class SupabaseAuthBackend(BaseBackend):
-    def authenticate(self, request, username = ..., password = ..., **kwargs):
-        URL, KEY = os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY')
-        supabase = create_client(supabase_url=URL, supabase_key=KEY)
+    def __str__(self):
+        return self.user.get_full_name()
 
+class RecommendationRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('completed', 'Completed'),
+    ]
     
-    def get_user(self, user_id):
-        try:
-            return 
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    purpose = models.TextField()
+    university_name = models.CharField(max_length=200, blank=True)
+    program_name = models.CharField(max_length=200, blank=True)
+    deadline = models.DateField(null=True, blank=True)
+    additional_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AdmissionRecord(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    university_name = models.CharField(max_length=200)
+    program_name = models.CharField(max_length=200)
+    admission_date = models.DateField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    is_scholarship = models.BooleanField(default=False)
+    scholarship_details = models.TextField(blank=True)
+    letter_file_path = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
