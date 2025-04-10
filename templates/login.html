@@ -1,43 +1,31 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html> <!--declare -->
-<html lang="en"> <!--english-->
+{% block title%} HigherStudiesPortal | Login {% endblock %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loginpage.css' %}">
+    <script src="{% static 'js/login.js' %}"></script>
+{% endblock %}
 
-
-<!--utf-8 supports all cahracters,device width,linking css file -->
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Login Page | Codehal</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
-</head>
-<body>
+{% block content %}
     <div class="wrapper">
         <div class="form-wrapper sign-in">
             <form method="POST" action ="{% url 'login' %}">
-            {% csrf token %}
+            {% csrf_token %}
                 <h2>Login</h2>
                 <div class="input-group">
-                    <input type="text" required>
-                    <label for ="">Email</label>
-                    
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email" required>
                 </div>
                 <div class="input-group">
-                    <input type="password" required>
-                    <label for ="">Password</label>
-                    
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" id="password" required>
                 </div>
             <button type="submit">Login</button>
+        </form>
             <div class="signUp-link">
                 <p>Don't have an account ? <a href="{% url 'sign-up' %}" class="signUpBtn-link">Sign Up </a></a></p>
             </div>
-            </form>
         </div>
-
     </div>
-
-    <script src="{% static 'js/login.js' %}"></script>
-</body>
-</html>
+{% endblock %}

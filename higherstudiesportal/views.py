@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from supabase import create_client, Client
-from dotenv import load_dotenv
+from .utils.supabase_auth import determine_role_from_email, register_user
 
 # @login_required # enforce after auth is set up
 def lor_application_student(request):
@@ -31,6 +31,7 @@ def letter_upload(request):
 def index(request):
     return render(request, 'index.html')
 
+# @csrf_exempt
 @csrf_protect
 def login_view(request):
     if not request.method == "POST":
@@ -41,13 +42,14 @@ def login_view(request):
     password = request.POST['password']
     user = authenticate(request, email, password)
 
-    if user is not None:
-        login(request, user)
-        return redirect(request.GET.get('next', '/student/dashboard/'))
-    else:
-            # Handle invalid credentials
-            return render(request, 'login.html', {'error_message': 'Invalid email or password'})
-    
+    if user is None:
+        # Handle invalid credentials
+        return render(request, 'login.html', {'error_message': 'Invalid email or password'})
+    login(request, user)
+    role = determine_role_from_email(email)
+    return redirect(request.GET.get('next', f'/{role}/dashboard/'))
+
+
 def signup_view(request):
     if not request.method == "POST":
         return render(request, 'sign-up.html')
@@ -55,10 +57,32 @@ def signup_view(request):
     # for POST (sign-up method)
     email = request.POST['email']
     password = request.POST['password']
-    user = authenticate(request, email, password)
+    confirm_password = request.POST['confirm_password']
+    full_name = request.POST['full_name']
 
-    if user is not None:
-        login(request, user)
+    if password != confirm_password:
+        messages.error(request, "Passwords do not match")
+        return render(request, 'sign-up.html')
+    
+    role = determine_role_from_email(email)
+
+    # Role specific fields are obtained
+    department = request.POST.get('department')
+    graduation_year = None
+    designation = None
+
+    if role=='faculty':
+        designation = request.POST.get('designation')
+    elif role=='student':
+        graduation_year = request.POST.get('graduation_year')
+
+    result = register_user(email, password, full_name, department, graduation_year)
+
+    if result['success']:
+        login(request, result['user'])
+        messages.success(request, f"Welcome {full_name}!")
+        return redirect(f'{role}/dashboard')
     else:
-            # Handle invalid credentials
-            return render(request, 'sign-up.html', {'error_message': 'Invalid email or password'})
+        messages.error(request, f"Error {result['error']}")
+        return render(request, 'sign-up.html')
+    
