@@ -3,34 +3,77 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.core.exceptions import PermissionDenied
 from .utils.supabase_auth import determine_role_from_email, register_user
+from .models import Student, Faculty
 
-# @login_required # enforce after auth is set up
+#@login_required # decorator enforce after auth is set up
+
+def type_user(request):
+    """Function to get the type of user logged in"""
+    if not request.user.is_authenticated:
+        return None # support not found yet
+
+    current_user = request.user
+    try:
+        stud = Student.objects.get(user=current_user)
+        user_type='student' 
+    except Student.DoesNotExist:
+        try:
+            facul = Faculty.objects.get(user=current_user)
+            user_type='faculty'
+        except Faculty.DoesNotExist:
+            user_type = 'notanyofthese'
+    print("DEBUG: USER TYPE IS", user_type)
+    return user_type
+
+@login_required
 def lor_application_student(request):
+    # if type_user(request) != 'student':
+    #     raise PermissionDenied()
     return render(request, 'student/lor_application.html')
 
+@login_required
 def lor_tracking_student(request):
+    # if type_user(request) != 'student':
+    #     raise PermissionDenied()
     return render(request, 'student/lor_tracking.html')
 
-def dashboard(request):
-    """Returns the dashboard depending upon the type of user"""
-    if not request.method == "GET":
-        return
-    
-    
+@login_required
+def letter_upload(request):
+    # if type_user(request) != 'student':
+    #     raise PermissionDenied()
+    return render(request, 'student/cc1.html')
 
+@login_required
 def dashboard_student(request):
+    # if type_user(request) != 'student':
+    #     raise PermissionDenied()
     return render(request, 'student/student_dashboard.html')
 
+@login_required
 def dashboard_faculty(request):
+    # if type_user(request) != 'faculty':
+    #     raise PermissionDenied()
     return render(request, 'faculty/faculty_dashboard.html')
 
-def letter_upload(request):
-    return render(request, 'student/cc1.html')
+@login_required
+def f_verify(request):
+    # if type_user(request) != 'faculty':
+    #     raise PermissionDenied()
+    return render(request, 'faculty/f_verify.html')
+
+@login_required
+def f_student_list(request):
+    # if type_user(request) != 'faculty':
+    #     raise PermissionDenied()
+    return render(request, 'faculty/f_student_list.html')
 
 def index(request):
     return render(request, 'index.html')
 
+
+# Login and Signup
 # @csrf_exempt
 @csrf_protect
 def login_view(request):
@@ -48,7 +91,7 @@ def login_view(request):
     
     login(request=request, user=user)
     role = determine_role_from_email(email)
-    return redirect(request.GET.get('next', f'/student/dashboard/'))
+    return redirect(request.GET.get('next', f'/{role}/dashboard/'))
 
 
 def signup_view(request):
@@ -97,3 +140,6 @@ def signup_view(request):
         messages.error(request, f"Error {result['error']}")
         return render(request, 'sign-up.html')
     
+
+def logout(request):
+    pass

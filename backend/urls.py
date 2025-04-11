@@ -31,6 +31,7 @@ urlpatterns = [
     # Login page
     path('login/', views.login_view, name='login'),
     path('sign-up/', views.signup_view, name='sign-up'),
+    path('logout/', views.logout, name='logout'),
     # Student Routes
     path('student/dashboard/', views.dashboard_student, name='student_dashboard'),
     path('student/lor/', views.lor_application_student, name='student_lor'),
@@ -38,5 +39,7 @@ urlpatterns = [
     path('student/letter-upload', views.letter_upload, name='student_letter-upload'),
     # Faculty routes
     path('faculty/dashboard/', views.dashboard_faculty, name='faculty_dashboard'),
+    path('faculty/f_student_list/', views.f_student_list, name='f_student_list'),
+    path('faculty/f_verify/', views.f_verify, name='f_verify'),
 ]
 
