@@ -83,7 +83,8 @@ def register_user(email, password, full_name, department=None, graduation_year=N
                 "department": department,
                 "graduation_year": graduation_year
             }
-            supabase.table('students').insert(profile_data).execute()
+            supabase.table('student').insert(profile_data).execute()
+
         elif role == 'faculty':
             profile_data = {
                 "id": user_data.id, 

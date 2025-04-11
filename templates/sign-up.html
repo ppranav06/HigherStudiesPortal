@@ -12,82 +12,100 @@
     <div class="wrapper"> 
         <div class="form-wrapper sign-in">
             <h2>Sign Up</h2>
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                    {{ message }}
-                </div>
-                {% endfor %}
             <form method="POST" action ="{% url 'sign-up' %}">
                 {% csrf_token %}
-                </div>
-                {% endif %}
                 <div class="input-group">
                     <label for="email">Email:</label>
                     <input type="email" name="email" id="email" required>
                 </div>
+                
                 <div class="input-group">
-                    <label for="password">Password:</label>
-                    <input type="password" name="password" id="password" required>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
                 </div>
-        <div class="input-group">
-            <label for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name" required>
+                
+                <div class="input-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" required>
+                        <option value="">Select Department</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <!-- Add more departments as needed -->
+                    </select>
+                </div>
+
+                <!-- Student-specific fields (hidden by default) -->
+                <div class="input-group student-field" style="display: none;">
+                    <label for="graduation_year">Graduation Year</label>
+                    <select id="graduation_year" name="graduation_year">
+                        <option value="">Select Year</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                    </select>
+                </div>
+
+                <!-- Faculty-specific fields (hidden by default) -->
+                <div class="input-group faculty-field" style="display: none;">
+                    <label for="designation">Designation</label>
+                    <select id="designation" name="designation">
+                        <option value="">Select Designation</option>
+                        <option value="Assistant Professor">Assistant Professor</option>
+                        <option value="Associate Professor">Associate Professor</option>
+                        <option value="Professor">Professor</option>
+                        <option value="HOD">Head of Department</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Sign Up</button><div class="signUp-link">
+                <p>Don't have an account ? <a href="{% url 'login' %}" class="signUpBtn-link">Login</a></p>
+            </form>
         </div>
-        
-        <div class="input-group">
-            <label for="department">Department</label>
-            <select id="department" name="department" required>
-                <option value="">Select Department</option>
-                <option value="Information Technology">Information Technology</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Electrical Engineering">Electrical Engineering</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                <!-- Add more departments as needed -->
-            </select>
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
         </div>
-        
-        <!-- Student-specific fields (hidden by default) -->
-        <div class="input-group student-field" style="display: none;">
-            <label for="graduation_year">Graduation Year</label>
-            <select id="graduation_year" name="graduation_year">
-                <option value="">Select Year</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-            </select>
-        </div>
-        
-        <!-- Faculty-specific fields (hidden by default) -->
-        <div class="input-group faculty-field" style="display: none;">
-            <label for="designation">Designation</label>
-            <select id="designation" name="designation">
-                <option value="">Select Designation</option>
-                <option value="Assistant Professor">Assistant Professor</option>
-                <option value="Associate Professor">Associate Professor</option>
-                <option value="Professor">Professor</option>
-                <option value="HOD">Head of Department</option>
-            </select>
-        </div>
-        
-        <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        
-        <div class="input-group">
-            <label for="confirm_password">Confirm Password</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Sign Up</button><div class="signUp-link">
-        <p>Don't have an account ? <a href="{% url 'login' %}" class="signUpBtn-link">Login</a></a></p>
+        {% endif %}
     </div>
-</form>
-    
-    
-</div>
+
+    <!-- 
+    <script>
+        document.getElementById('userType').addEventListener('change', function() {
+        const studentFields = document.querySelector('.student-field');
+        const facultyFields = document.querySelector('.faculty-field');
+        
+        if (this.value === 'student') {
+        studentFields.style.display = 'block';
+        facultyFields.style.display = 'none';
+        } else if (this.value === 'faculty') {
+        studentFields.style.display = 'none';
+        facultyFields.style.display = 'block';
+        } else {
+        studentFields.style.display = 'none';
+        facultyFields.style.display = 'none';
+        }
+        });
+
+    </script> 
+    -->
+
+            
 
 {% endblock %}

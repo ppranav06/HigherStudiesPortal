@@ -14,8 +14,10 @@ body {
 }
 .wrapper {
   position: relative;
-  width: 450px;
-  height: 400px;
+  min-width: 450px;
+  min-height: 400px;
+  width: fit-content;
+  height: fit-content;
   background: #000;
   box-shadow: 0 0 50px rgb(0, 237, 250);
   border-radius: 20px;
@@ -120,4 +122,44 @@ button {
 }
 .signUp-link p a:hover {
   text-decoration: underline;
+}
+
+/* Messages styling - completely outside the wrapper */
+.messages {
+  position: absolute;
+  bottom: 10px; /* Reduced from 50px to move it further down */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 450px;
+  color: #fff;
+  text-align: center;
+  z-index: 90;
+}
+
+/* If the above doesn't create enough separation, you could try this alternative */
+/* Alternative approach: position below the form instead of absolute positioning */
+.messages-alt {
+  width: 100%;
+  color: #fff;
+  text-align: center;
+  z-index: 90;
+  margin-top: 20px; /* Add space between form and messages */
+}
+
+.alert {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background-color: rgba(0, 237, 250, 0.2);
+  box-shadow: 0 0 10px rgba(0, 237, 250, 0.5);
+}
+
+.alert-success {
+  background-color: rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.alert-error {
+  background-color: rgba(255, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }

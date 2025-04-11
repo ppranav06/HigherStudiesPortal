@@ -40,14 +40,15 @@ def login_view(request):
     # for POST (login method)
     email = request.POST['email']
     password = request.POST['password']
-    user = authenticate(request, email, password)
+    user = authenticate(request=request, username=email, password=password)
 
     if user is None:
         # Handle invalid credentials
         return render(request, 'login.html', {'error_message': 'Invalid email or password'})
-    login(request, user)
+    
+    login(request=request, user=user)
     role = determine_role_from_email(email)
-    return redirect(request.GET.get('next', f'/{role}/dashboard/'))
+    return redirect(request.GET.get('next', f'/student/dashboard/'))
 
 
 def signup_view(request):
@@ -72,16 +73,26 @@ def signup_view(request):
     designation = None
 
     if role=='faculty':
-        designation = request.POST.get('designation')
+        # designation = request.POST.get('designation')
+        designation = 'Associate Professor'
     elif role=='student':
-        graduation_year = request.POST.get('graduation_year')
+        # graduation_year = request.POST.get('graduation_year')
+        graduation_year = 2027
 
-    result = register_user(email, password, full_name, department, graduation_year)
+    result = register_user(email=email,
+        password=password,
+        full_name=full_name,
+        department=department,
+        graduation_year=graduation_year,
+        designation=designation
+    ) 
+    # even if values are hardcoded, this check is again done at supabase_auth backend, so it doesn't matter for now
+    # CHANGE LATER ^^^^^ (fix html)
 
     if result['success']:
-        login(request, result['user'])
+        login(request, result['user'], backend='django.contrib.auth.backends.ModelBackend')
         messages.success(request, f"Welcome {full_name}!")
-        return redirect(f'{role}/dashboard')
+        return redirect(f'/login')
     else:
         messages.error(request, f"Error {result['error']}")
         return render(request, 'sign-up.html')
