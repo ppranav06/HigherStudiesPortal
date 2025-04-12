@@ -2,10 +2,20 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
-from .utils.supabase_auth import determine_role_from_email, register_user
+
+import uuid
+from datetime import datetime
+import logging
+from supabase import create_client
+from dotenv import load_dotenv
+
 from .models import Student, Faculty
+from .utils.supabase_auth import determine_role_from_email, register_user, getURLKEY
+from .utils.supabase_storage import upload_file_to_bucket
 
 #@login_required # decorator enforce after auth is set up
 
@@ -70,7 +80,9 @@ def f_student_list(request):
     return render(request, 'faculty/f_student_list.html')
 
 def index(request):
-    return render(request, 'index.html')
+    # current_user = request.user
+    # if not current_user:
+        return redirect('/login')
 
 
 # Login and Signup
@@ -143,3 +155,53 @@ def signup_view(request):
 
 def logout(request):
     pass
+
+logger = logging.getLogger(__name__)
+
+@login_required
+@require_POST
+def upload_admission_letter(request):
+    try:
+        # Get current user
+        user = request.user
+        student_id = user.student.id  # Assuming user has a related student model
+        
+        # Extract file from request
+        if 'admission_letter' not in request.FILES:
+            return JsonResponse({"error": "No file provided"}, status=400)
+        
+        file = request.FILES['admission_letter']
+        
+        # Validate file type
+        if not file.name.endswith('.pdf'):
+            return JsonResponse({"error": "Only PDF files are allowed"}, status=400)
+        record_id = request.POST.get('record_id')
+               
+        upload_file_to_bucket(file_object=file,
+                              bucket_name='admission_letters',
+                              record_id=record_id,
+                              student_id=student_id,
+                              university_name=request.POST.get('university_name'),
+                              program_name=request.POST.get('program_name'),
+                              admission_date=request.POST.get('admission_date'),
+                              logger=logger
+                              )
+        
+        # Update the admission_records table with the file path
+        # Note: This assumes the user is already creating or has created an admission record
+        # You may need to adjust this logic based on your application flow
+        
+        # Option 1: If creating a new record along with the upload
+        # db_response = supabase.table('admission_records').insert({
+        #     'student_id': student_id,
+        #     'university_name': request.POST.get('university_name', ''),  # You might want to get these values from the form
+        #     'program_name': request.POST.get('program_name', ''),
+        #     'letter_file_path': file_path
+        # }).execute()
+        
+        # Option 2: If updating an existing record
+        # Get the record ID from the request if available
+
+    except Exception as e:
+        logger.exception(f"Error in upload_admission_letter: {str(e)}")
+        return JsonResponse({"error": str(e)}, status=500)
