@@ -8,7 +8,9 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from supabase.client import create_client
 from dotenv import load_dotenv
+from higherstudiesportal.models import Student, Faculty
 from .re_patterns_email import student_pattern,faculty_pattern
+
 import os
 import re
 
@@ -84,7 +86,13 @@ def register_user(email, password, full_name, department=None, graduation_year=N
                 "graduation_year": graduation_year
             }
             supabase.table('student').insert(profile_data).execute()
-
+            # Create user in model
+            Student.objects.create(
+                user = user_data,
+                department = profile_data['department'],
+                graduation_year = profile_data['graduation_year'],
+            )
+            
         elif role == 'faculty':
             profile_data = {
                 "id": user_data.id, 
@@ -94,6 +102,12 @@ def register_user(email, password, full_name, department=None, graduation_year=N
                 "designation": designation
             }
             supabase.table('faculty').insert(profile_data).execute()
+            # Create user in model
+            Faculty.objects.create(
+                user = user_data,
+                department = profile_data['department'],
+                designation = profile_data['designation'],
+            )
         
         # Create Django user
         django_user = User.objects.create_user(
