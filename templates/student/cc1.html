@@ -1,143 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Higher Studies Portal</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        body {
-            display: flex;
-            height: 100vh;
-            background-color: white;
-        }
-        /* Sidebar Styling */
-        .sidebar {
-            width: 250px;
-            background-color: #003C88;
-            padding: 20px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .sidebar img {
-        width: 100%; 
-        max-width: 200px;
-        display: block;
-        margin: 0 auto; }
-        .sidebar a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-        }
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: top;
-            top: 10%;
-            font-size: 70px;}
-        
-        /* Apply Button */
-        .apply-btn {
-            background-color: #003C88;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .apply-btn:hover {
-            background-color: #003C88;
-        }
-        body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        height: 100vh;
-        background-color: #f4f4f4;
-        }
+{% extends 'shared/sidebar.html' %}
+{% load static %}
 
-        .sidebar {
-            width: 250px;
-            background-color: #003C88;
-            color: white;
-            height: 100vh;
-            padding-top: 20px;
-        }
+{% block title %}HigherStudiesPortal | Upload Admission Letter {% endblock %}
+{% block head %}
+    <link rel= "stylesheet" href="{% static 'css/cc1.css' %}" />
+    <script src="{% static 'js/cc1.js' %}"></script>
+{% endblock %}
 
-        .upload-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            text-align: center;
-            margin: auto;
-            position: absolute;
-            top: 50%;
-            left: calc(50% + 100px); 
-            transform: translate(-50%, -50%);
-        }
-
-        .file-input {
-            margin-bottom: 10px;
-        }
-
-        .error {
-            color: red;
-            font-size: 12px;
-        }
-
-        .upload-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .upload-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <img src="ssn.png" alt="SSN Logo">
-    </div>
-
+{% block page_content %}
     <!-- Main Content -->
     <div class="upload-container">
         <h2>Upload Documents</h2>
         
-        <label>Admit Card (PDF, Max 2MB)</label>
+        <!-- <label>Admit Card (PDF, Max 2MB)</label>
         <input type="file" id="admitCard" class="file-input" accept=".pdf">
-        <div id="errorAdmit" class="error"></div>
+        <div id="errorAdmit" class="error"></div> -->
+        <div class="input-group">
+            <label for="university_name">Univesity Name</label>
+            <input type="text" id="university_name" name="university_name" required>
+        </div>
+    
+        <div class="input-group">
+            <label for="program_name">Program Name</label>
+            <input type="text" id="program_name" name="program_name" required>
+        </div>
+    
+        <div class="input-group">
+            <label for="admission_date">Admission Date</label>
+            <input type="date" id="admission_date" name="admission_date" required>
+        </div>
     
         <label>Admission Letter (PDF, Max 2MB)</label>
         <input type="file" id="admissionLetter" class="file-input" accept=".pdf">
@@ -145,46 +36,4 @@
     
         <button id="uploadBtn" class="upload-btn" disabled>Upload Files</button>
     </div>
-    <script>
-        const admitCardInput = document.getElementById("admitCard");
-        const admissionLetterInput = document.getElementById("admissionLetter");
-        const uploadBtn = document.getElementById("uploadBtn");
-        const errorAdmit = document.getElementById("errorAdmit");
-        const errorAdmission = document.getElementById("errorAdmission");
-    
-        function validateFile(input, errorElement) {
-            if (!input.files.length) {
-                errorElement.textContent = "";
-                return false;
-            }
-    
-            const file = input.files[0];
-            const maxSize = 2 * 1024 * 1024; 
-    
-            if (file.type !== "application/pdf") {
-                errorElement.textContent = "Only PDF files are allowed.";
-                input.value = "";
-                return false;
-            }
-    
-            if (file.size > maxSize) {
-                errorElement.textContent = "File size must be under 2MB.";
-                input.value = "";
-                return false;
-            }
-    
-            errorElement.textContent = "";
-            return true;
-        }
-    
-        function checkUploadEligibility() {
-            const isAdmitValid = validateFile(admitCardInput, errorAdmit);
-            const isAdmissionValid = validateFile(admissionLetterInput, errorAdmission);
-            uploadBtn.disabled = !(isAdmitValid && isAdmissionValid);
-        }
-    
-        admitCardInput.addEventListener("change", checkUploadEligibility);
-        admissionLetterInput.addEventListener("change", checkUploadEligibility);
-    </script>
-</body>
-</html>
+{% endblock %}
