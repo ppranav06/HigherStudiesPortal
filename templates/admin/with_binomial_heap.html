@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      display: flex;
+      background-color: white;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #003C88;
+      padding: 20px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    .sidebar img {
+      width: 100%;
+      max-width: 200px;
+      display: block;
+      margin: 0 auto 30px;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: white;
+      font-size: 16px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .content {
+      margin-left: 270px;
+      padding: 20px;
+      width: calc(100% - 270px);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #003C88;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #001f4d;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .download-btn {
+      padding: 8px 14px;
+      font-size: 14px;
+      border: none;
+      background-color: green;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+
+    .download-btn:hover {
+      background-color: darkgreen;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="ssn.png" alt="SSN Logo" />
+    <a onclick="showPanel('addProfessorPanel')">Add Professor</a>
+    <a onclick="showPanel('removeProfessorPanel')">Remove Professor</a>
+    <a onclick="showPanel('requestsPanel')">View Requests</a>
+  </div>
+
+  <!-- Content Panels -->
+  <div class="content">
+    <!-- Add Professor -->
+    <div id="addProfessorPanel" style="display: none;">
+      <h2>Add Professor</h2>
+      <div class="form-group">
+        <label for="profName">Name:</label>
+        <input type="text" id="profName" />
+      </div>
+      <div class="form-group">
+        <label for="profEmail">Email:</label>
+        <input type="email" id="profEmail" />
+      </div>
+      <div class="form-group">
+        <label for="profDept">Department:</label>
+        <input type="text" id="profDept" />
+      </div>
+      <button onclick="addProfessor()">Add Professor</button>
+    </div>
+
+    <!-- Remove Professor -->
+    <div id="removeProfessorPanel" style="display: none;">
+      <h2>Remove Professor</h2>
+      <div class="form-group">
+        <label for="profSelect">Select Professor:</label>
+        <select id="profSelect"></select>
+      </div>
+      <button onclick="removeProfessor()">Remove Selected</button>
+    </div>
+
+    <!-- Course Completion Requests -->
+    <div id="requestsPanel" style="display: none;">
+      <h2>Course Completion Requests</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Certificate</th>
+          </tr>
+        </thead>
+        <tbody id="requestsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Supabase & Script -->
+  <!-- <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <script>
+    const supabaseUrl = 'https://your-project-id.supabase.co';
+    const supabaseKey = 'your-anon-public-key';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    function showPanel(panelId) {
+      const panels = ['addProfessorPanel', 'removeProfessorPanel', 'requestsPanel'];
+      panels.forEach(id => {
+        document.getElementById(id).style.display = (id === panelId) ? 'block' : 'none';
+      });
+
+      if (panelId === 'removeProfessorPanel') loadProfessorList();
+      if (panelId === 'requestsPanel') loadRequests();
+    }
+
+    async function addProfessor() {
+      const name = document.getElementById("profName").value.trim();
+      const email = document.getElementById("profEmail").value.trim();
+      const dept = document.getElementById("profDept").value.trim();
+
+      if (!name || !email || !dept) {
+        alert("Fill in all fields.");
+        return;
+      }
+
+      const { error } = await supabase.from("professors").insert([{ name, email, department: dept }]);
+      if (error) {
+        console.error(error);
+        alert("Error adding professor.");
+      } else {
+        alert("✅ Professor added.");
+        document.getElementById("profName").value = "";
+        document.getElementById("profEmail").value = "";
+        document.getElementById("profDept").value = "";
+      }
+    }
+
+    async function loadProfessorList() {
+      const { data, error } = await supabase.from("professors").select("*");
+      const select = document.getElementById("profSelect");
+      select.innerHTML = "";
+
+      if (data) {
+        data.forEach(prof => {
+          const option = document.createElement("option");
+          option.value = prof.id; // assuming primary key is 'id'
+          option.textContent = `${prof.name} (${prof.email})`;
+          select.appendChild(option);
+        });
+      } else {
+        console.error(error);
+      }
+    }
+
+    async function removeProfessor() {
+      const profId = document.getElementById("profSelect").value;
+      const { error } = await supabase.from("professors").delete().eq("id", profId);
+      if (error) {
+        alert("Failed to remove professor.");
+        console.error(error);
+      } else {
+        alert("✅ Professor removed.");
+        loadProfessorList();
+      }
+    }
+
+    async function loadRequests() {
+      const { data, error } = await supabase.from("cc_requests").select("*");
+      const tbody = document.getElementById("requestsTable");
+      tbody.innerHTML = "";
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      data.forEach(req => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${req.name}</td>
+          <td>${req.email}</td>
+          <td>
+            <select onchange="updateStatus(${req.id}, this.value)">
+              <option value="Pending" ${req.status === "Pending" ? "selected" : ""}>Pending</option>
+              <option value="Approved" ${req.status === "Approved" ? "selected" : ""}>Approved</option>
+              <option value="Rejected" ${req.status === "Rejected" ? "selected" : ""}>Rejected</option>
+            </select>
+          </td>
+          <td>
+            <a class="download-btn" href="https://your-project-id.supabase.co/storage/v1/object/public/your-bucket/${req.file_path}" target="_blank">Download</a>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function updateStatus(requestId, newStatus) {
+      const { error } = await supabase.from("cc_requests").update({ status: newStatus }).eq("id", requestId);
+      if (error) {
+        alert("Error updating status.");
+        console.error(error);
+      } else {
+        alert(`✅ Status updated to ${newStatus}`);
+      }
+    }
+  </script> -->
+  <script>
+    const supabaseUrl = 'https://your-project-id.supabase.co';
+    const supabaseKey = 'your-anon-public-key';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  
+    function showPanel(panelId) {
+      const panels = ['addProfessorPanel', 'removeProfessorPanel', 'requestsPanel'];
+      panels.forEach(id => {
+        document.getElementById(id).style.display = (id === panelId) ? 'block' : 'none';
+      });
+  
+      if (panelId === 'removeProfessorPanel') loadProfessorList();
+      if (panelId === 'requestsPanel') loadRequests();
+    }
+    //Binomial Heap Implementation
+    class BinomialNode {
+      constructor(request, priority) {
+        this.request = request;
+        this.priority = priority;
+        this.children = [];
+        this.degree = 0;
+      }
+    }
+  
+    class BinomialHeap {
+      constructor() {
+        this.trees = [];
+      }
+  
+      mergeTrees(t1, t2) {
+        if (t1.priority > t2.priority) [t1, t2] = [t2, t1];
+        t1.children.push(t2);
+        t1.degree++;
+        return t1;
+      }
+  
+      insert(request, priority) {
+        const newHeap = new BinomialHeap();
+        newHeap.trees.push(new BinomialNode(request, priority));
+        this.union(newHeap);
+      }
+  
+      union(other) {
+        const newTrees = [];
+        let i = 0, j = 0;
+        let carry = null;
+  
+        while (i < this.trees.length || j < other.trees.length || carry !== null) {
+          const t1 = i < this.trees.length ? this.trees[i] : null;
+          const t2 = j < other.trees.length ? other.trees[j] : null;
+  
+          const degreeSet = new Set([
+            t1 ? t1.degree : null,
+            t2 ? t2.degree : null,
+            carry ? carry.degree : null
+          ]);
+  
+          if (degreeSet.size === 1 && degreeSet.has(null)) break;
+  
+          const degree = Math.min(
+            t1 ? t1.degree : Infinity,
+            t2 ? t2.degree : Infinity,
+            carry ? carry.degree : Infinity
+          );
+  
+          const sameDegreeTrees = [t1, t2, carry].filter(t => t && t.degree === degree);
+  
+          if (sameDegreeTrees.length === 1) {
+            newTrees.push(sameDegreeTrees[0]);
+            if (sameDegreeTrees[0] === t1) i++;
+            else if (sameDegreeTrees[0] === t2) j++;
+            else carry = null;
+          } else if (sameDegreeTrees.length === 2) {
+            carry = this.mergeTrees(sameDegreeTrees[0], sameDegreeTrees[1]);
+            if (sameDegreeTrees.includes(t1)) i++;
+            if (sameDegreeTrees.includes(t2)) j++;
+          } else if (sameDegreeTrees.length === 3) {
+            newTrees.push(sameDegreeTrees[0]);
+            carry = this.mergeTrees(sameDegreeTrees[1], sameDegreeTrees[2]);
+            i++;
+            j++;
+          }
+        }
+  
+        this.trees = newTrees;
+      }
+  
+      getMin() {
+        let minNode = null;
+        this.trees.forEach(tree => {
+          if (!minNode || tree.priority < minNode.priority) {
+            minNode = tree;
+          }
+        });
+        return minNode;
+      }
+  
+      extractMin() {
+        if (this.trees.length === 0) return null;
+  
+        let minIndex = 0;
+        for (let i = 1; i < this.trees.length; i++) {
+          if (this.trees[i].priority < this.trees[minIndex].priority) {
+            minIndex = i;
+          }
+        }
+  
+        const minNode = this.trees.splice(minIndex, 1)[0];
+        const childHeap = new BinomialHeap();
+        childHeap.trees = minNode.children.reverse();
+        this.union(childHeap);
+  
+        return minNode.request;
+      }
+  
+      isEmpty() {
+        return this.trees.length === 0;
+      }
+    }
+  
+    async function loadProfessorList() {
+      const { data, error } = await supabase.from("professors").select("*");
+      const select = document.getElementById("profSelect");
+      select.innerHTML = "";
+  
+      if (data) {
+        data.forEach(prof => {
+          const option = document.createElement("option");
+          option.value = prof.id;
+          option.textContent = `${prof.name} (${prof.email})`;
+          select.appendChild(option);
+        });
+      } else {
+        console.error(error);
+      }
+    }
+  
+    async function removeProfessor() {
+      const profId = document.getElementById("profSelect").value;
+      const { error } = await supabase.from("professors").delete().eq("id", profId);
+      if (error) {
+        alert("Failed to remove professor.");
+        console.error(error);
+      } else {
+        alert("✅ Professor removed.");
+        loadProfessorList();
+      }
+    }
+  
+    async function loadRequests() {
+      const { data, error } = await supabase.from("cc_requests").select("*");
+      const tbody = document.getElementById("requestsTable");
+      tbody.innerHTML = "";
+  
+      if (error) {
+        console.error(error);
+        return;
+      }
+  
+      const heap = new BinomialHeap();
+  
+      const today = new Date();
+  
+      data.forEach(req => {
+        const admissionDate = new Date(req.admission_date); // assume this field is in `YYYY-MM-DD`
+        const diffInDays = Math.ceil((admissionDate - today) / (1000 * 60 * 60 * 24));
+        const priority = Math.max(diffInDays, 0); // lower days => higher priority
+        heap.insert(req, priority);
+      });
+  
+      while (!heap.isEmpty()) {
+        const req = heap.extractMin();
+  
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${req.name}</td>
+          <td>${req.email}</td>
+          <td>
+            <select onchange="updateStatus(${req.id}, this.value)">
+              <option value="Pending" ${req.status === "Pending" ? "selected" : ""}>Pending</option>
+              <option value="Approved" ${req.status === "Approved" ? "selected" : ""}>Approved</option>
+              <option value="Rejected" ${req.status === "Rejected" ? "selected" : ""}>Rejected</option>
+            </select>
+          </td>
+          <td>
+            <a class="download-btn" href="https://your-project-id.supabase.co/storage/v1/object/public/your-bucket/${req.file_path}" target="_blank">Download</a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+  
+    async function updateStatus(requestId, newStatus) {
+      const { error } = await supabase.from("cc_requests").update({ status: newStatus }).eq("id", requestId);
+      if (error) {
+        alert("Error updating status.");
+        console.error(error);
+      } else {
+        alert(`✅ Status updated to ${newStatus}`);
+      }
+    }
+  </script>  
+</body>
+</html>
