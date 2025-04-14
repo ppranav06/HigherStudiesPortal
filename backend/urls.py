@@ -35,11 +35,13 @@ urlpatterns = [
     # Student Routes
     path('student/dashboard/', views.dashboard_student, name='student_dashboard'),
     path('student/lor/', views.lor_application_student, name='student_lor'),
-    path('student/lor-tracking/', views.lor_tracking_student, name='student_lor-tracking'),
+    path('student/lor-tracking/', views.lor_tracking_student, name='lor-tracking'),
     path('student/letter-upload', views.letter_upload, name='student_letter-upload'),
     # Faculty routes
     path('faculty/dashboard/', views.dashboard_faculty, name='faculty_dashboard'),
     path('faculty/f_student_list/', views.f_student_list, name='f_student_list'),
     path('faculty/f_verify/', views.f_verify, name='f_verify'),
+    # Upload path
+    path('upload_admission_letter/', views.upload_admission_letter, name='upload_admission_letter'),
 ]
 
