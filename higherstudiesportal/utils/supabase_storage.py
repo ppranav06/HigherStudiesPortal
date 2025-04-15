@@ -25,7 +25,7 @@ def get_file_path(file_object, bucket_name, student_id):
     
     # Full path for the file in the bucket
     file_path = f"{user_folder}/{unique_filename}"
-
+    print("DEBUG: File path is ", file_path)
     return file_path
 
 def insert_record_fileupload(supabaseClient, 
@@ -58,13 +58,14 @@ def upload_file_to_bucket(file_object, bucket_name,
                           student_id, university_name, program_name, admission_date, record_id,
                           logger):
     load_dotenv('.env')
-    supabase = create_client(getURLKEY())
+    URL, KEY = getURLKEY()
+    supabase = create_client(URL,KEY)
     
     file_path = get_file_path(file_object, bucket_name, student_id)
 
     storage_response = supabase.storage.from_('documents').upload(
         file_path, 
-        file_object, # if file from requests, use file.read() to bring here
+        file_object.read(), # if file from requests, use file.read() to bring here
         file_options={'content-type': file_object.content_type}
     )
 

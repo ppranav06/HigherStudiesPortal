@@ -18,12 +18,12 @@
             {% if student_check %}
                 <!-- Student Links -->
                 <li><a href="{% url 'student_lor' %}" style="text-decoration: none; color: white">LoR Application</a></li>
-                <li><a href="{% url 'student/lor-tracking' %}" style="text-decoration: none; color: white">LoR Tracking</a></li>
-                <li><a href="{% url 'student/letter-upload' %}" style="text-decoration: none; color: white">Course Completion Certificate</a></li>
-                <li><a href="{% url 'student/lor' %}" style="text-decoration: none; color: white">Verification Tracking</a></li>
+                <li><a href="{% url 'lor-tracking' %}" style="text-decoration: none; color: white">LoR Tracking</a></li>
+                <li><a href="{% url 'student_letter-upload' %}" style="text-decoration: none; color: white">Course Completion Certificate</a></li>
+                <li><a href="{% url 'student_lor' %}" style="text-decoration: none; color: white">Verification Tracking</a></li>
             {% elif faculty_check %}
                 <!-- Faculty Links -->
-                <li><a href="{% url 'faculty/dashboard' %}" style="text-decoration: none; color: white">Dashboard</a></li>
+                <li><a href="{% url 'faculty_dashboard' %}" style="text-decoration: none; color: white">Dashboard</a></li>
                 <li><a href="f_student_list.html" style="text-decoration: none; color: white">Student Details</a></li>
                 <li><a href="f_verify.html" style="text-decoration: none; color: white">Verify</a></li>
 

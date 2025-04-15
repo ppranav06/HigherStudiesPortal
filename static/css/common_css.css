@@ -36,9 +36,9 @@ body {
     cursor: pointer;
     padding-left: 30px;
 }
-.sidebar ul li:hover {
+/* .sidebar ul li:hover {
     background-color: #0056b3;
-}
+} */
 .content {
     flex-grow: 1;
     padding: 20px;

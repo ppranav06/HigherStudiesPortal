@@ -64,6 +64,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+AUTH_USER_MODEL = 'auth.User'
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -131,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -152,8 +154,6 @@ STATICFILES_DIRS=[
     BASE_DIR / "static",
 ]
 
-# def skip_post_migrate(sender, **kwargs):
-#     pass
-
-# post_migrate.disconnect(apps.get_app_config('contenttypes').create_contenttypes, sender=apps.get_app_config('contenttypes'))
-# post_migrate.connect(skip_post_migrate, sender=apps.get_app_config('contenttypes'))
+# Login and logout redirection 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
