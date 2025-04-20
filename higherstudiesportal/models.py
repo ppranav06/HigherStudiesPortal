@@ -1,5 +1,13 @@
 from django.db import models
+# from django.contrib.auth.models import AbstractUser
+import uuid
 from django.contrib.auth.models import User
+class SupabaseUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    supabase_uuid = models.UUIDField(unique=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.supabase_uuid}"
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

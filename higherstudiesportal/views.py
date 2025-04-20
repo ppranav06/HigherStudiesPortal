@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -7,14 +7,10 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 
-import uuid
-from datetime import datetime
 import logging
-from supabase import create_client
-from dotenv import load_dotenv
 
 from .models import Student, Faculty
-from .utils.supabase_auth import determine_role_from_email, register_user, getURLKEY
+from .utils.supabase_auth import determine_role_from_email, register_user, get_supabase_uuid
 from .utils.supabase_storage import upload_file_to_bucket
 
 #@login_required # decorator enforce after auth is set up
@@ -39,44 +35,44 @@ def type_user(request):
 
 @login_required
 def lor_application_student(request):
-    # if type_user(request) != 'student':
-    #     raise PermissionDenied()
+    if type_user(request) != 'student':
+        raise PermissionDenied()
     return render(request, 'student/lor_application.html')
 
 @login_required
 def lor_tracking_student(request):
-    # if type_user(request) != 'student':
-    #     raise PermissionDenied()
+    if type_user(request) != 'student':
+        raise PermissionDenied()
     return render(request, 'student/lor_tracking.html')
 
 @login_required
 def letter_upload(request):
-    # if type_user(request) != 'student':
-    #     raise PermissionDenied()
+    if type_user(request) != 'student':
+        raise PermissionDenied()
     return render(request, 'student/cc1.html')
 
 @login_required
 def dashboard_student(request):
-    # if type_user(request) != 'student':
-    #     raise PermissionDenied()
+    if type_user(request) != 'student':
+        raise PermissionDenied()
     return render(request, 'student/student_dashboard.html')
 
 @login_required
 def dashboard_faculty(request):
-    # if type_user(request) != 'faculty':
-    #     raise PermissionDenied()
+    if type_user(request) != 'faculty':
+        raise PermissionDenied()
     return render(request, 'faculty/faculty_dashboard.html')
 
 @login_required
 def f_verify(request):
-    # if type_user(request) != 'faculty':
-    #     raise PermissionDenied()
+    if type_user(request) != 'faculty':
+        raise PermissionDenied()
     return render(request, 'faculty/f_verify.html')
 
 @login_required
 def f_student_list(request):
-    # if type_user(request) != 'faculty':
-    #     raise PermissionDenied()
+    if type_user(request) != 'faculty':
+        raise PermissionDenied()
     return render(request, 'faculty/f_student_list.html')
 
 def index(request):
@@ -153,18 +149,22 @@ def signup_view(request):
         return render(request, 'sign-up.html')
     
 
-def logout(request):
-    pass
+def logout_view(request):
+    logout(request)
+    return redirect('/accounts/login')
+    
 
 logger = logging.getLogger(__name__)
 
 @login_required
 @require_POST
 def upload_admission_letter(request):
+    user = request.user
     try:
+        student = Student.objects.get(user=user)  # Assuming you have a Student model linked to the user
+        
         # Get current user
-        user = request.user
-        student_id = user.student.id  # Assuming user has a related student model
+        student_id = get_supabase_uuid(django_user=user) # Getting the supabase UUID from the Django user object
         
         # Extract file from request
         if 'admission_letter' not in request.FILES:

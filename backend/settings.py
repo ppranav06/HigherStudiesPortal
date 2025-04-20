@@ -155,5 +155,12 @@ STATICFILES_DIRS=[
 ]
 
 # Login and logout redirection 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/login/'
+# Session settings
+SESSION_COOKIE_AGE = 1209600  # Two weeks, in seconds
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# CSRF settings
+CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_HTTPONLY = True
+# CSRF_COOKIE_SAMESITE = 'Lax'

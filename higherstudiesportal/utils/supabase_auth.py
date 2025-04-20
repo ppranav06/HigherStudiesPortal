@@ -8,7 +8,7 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from supabase.client import create_client
 from dotenv import load_dotenv
-from higherstudiesportal.models import Student, Faculty
+from higherstudiesportal.models import Student, Faculty, SupabaseUser
 from .re_patterns_email import student_pattern,faculty_pattern
 
 import os
@@ -17,7 +17,7 @@ import re
 getURLKEY = lambda: (os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
 
 class SupabaseAuthBackend(BaseBackend):
-    def authenticate(self, request, username = None, password = None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
         load_dotenv('.env')
         URL, KEY = getURLKEY()
         supabase = create_client(supabase_url=URL, supabase_key=KEY)
@@ -29,13 +29,37 @@ class SupabaseAuthBackend(BaseBackend):
                 }
             )
             user_data = response.user
-            user = User.objects.get(username=user_data.email)
-            return user
-        except User.DoesNotExist as e:
-            print(f"Error: User does not exist: {e}")
+            supabase_uuid = user_data.id
+            
+            # Try to find user by Supabase UUID
+            try:
+                supabase_user = SupabaseUser.objects.get(supabase_uuid=supabase_uuid)
+                return supabase_user.user
+            except SupabaseUser.DoesNotExist:
+                # If no link exists, try to find by email
+                try:
+                    django_user = User.objects.get(email=username)
+                    # Create the link
+                    SupabaseUser.objects.create(
+                        user=django_user,
+                        supabase_uuid=supabase_uuid
+                    )
+                    return django_user
+                except User.DoesNotExist:
+                    # Create new user
+                    django_user = User.objects.create_user(
+                        username=username,
+                        email=username,
+                        password=password  # Django will hash this
+                    )
+                    SupabaseUser.objects.create(
+                        user=django_user,
+                        supabase_uuid=supabase_uuid
+                    )
+                    return django_user
         except Exception as e:
             print(f"Authentication error: {e}")
-
+            return None
     
     def get_user(self, user_id):
         try:
@@ -75,46 +99,62 @@ def register_user(email, password, full_name, department=None, graduation_year=N
         
         response = supabase.auth.sign_up(signup_data)
         user_data = response.user
+        supabase_uuid = user_data.id
+        
+        # Create Django user
+        first_name = full_name.split()[0] if ' ' in full_name else full_name
+        last_name = ' '.join(full_name.split()[1:]) if ' ' in full_name else ''
+        
+        django_user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name
+        )
+        
+        # Create the Supabase link
+        SupabaseUser.objects.create(
+            user=django_user,
+            supabase_uuid=supabase_uuid
+        )
         
         # Create profile based on role
         if role == 'student':
+            # Insert into Supabase
             profile_data = {
-                "id": user_data.id,
+                "id": supabase_uuid,
                 "email": email,
                 "full_name": full_name,
                 "department": department,
                 "graduation_year": graduation_year
             }
             supabase.table('student').insert(profile_data).execute()
-            # Create user in model
+            
+            # Create Django model
             Student.objects.create(
-                user = user_data,
-                department = profile_data['department'],
-                graduation_year = profile_data['graduation_year'],
+                user=django_user,
+                department=department,
+                graduation_year=graduation_year
             )
             
+        # Insert into Supabase
         elif role == 'faculty':
             profile_data = {
-                "id": user_data.id, 
+                "id": supabase_uuid, 
                 "email": email,
                 "full_name": full_name,
                 "department": department,
                 "designation": designation
             }
             supabase.table('faculty').insert(profile_data).execute()
-            # Create user in model
+            
+            # Create Django model
             Faculty.objects.create(
-                user = user_data,
-                department = profile_data['department'],
-                designation = profile_data['designation'],
+                user=django_user,
+                department=department,
+                designation=designation
             )
-        
-        # Create Django user
-        django_user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password  # Django will hash this
-        )
         
         return {
             "success": True,
@@ -127,3 +167,15 @@ def register_user(email, password, full_name, department=None, graduation_year=N
             "success": False,
             "error": str(e)
         }
+    
+def get_supabase_uuid(django_user):
+    """Get the Supabase UUID for a Django user"""
+    if django_user is None:
+        raise ValueError("Cannot get Supabase UUID for None user")
+    
+    try:
+        # Make sure we're querying with a User object
+        return SupabaseUser.objects.get(user=django_user).supabase_uuid
+    except SupabaseUser.DoesNotExist:
+        # Handle the case where the user doesn't have a Supabase record
+        raise ValueError(f"No Supabase user found for Django user {django_user.username}")
