@@ -36,6 +36,7 @@ urlpatterns = [
     # Student Routes
     path('student/dashboard/', views.dashboard_student, name='student_dashboard'),
     path('student/lor/', views.lor_application_student, name='student_lor'),
+    path('student/lor/submit/', views.submit_lor_request, name='submit_lor_request'),
     path('student/lor-tracking/', views.lor_tracking_student, name='lor-tracking'),
     path('student/letter-upload', views.letter_upload, name='student_letter-upload'),
     # Faculty routes

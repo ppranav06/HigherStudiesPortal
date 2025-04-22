@@ -85,11 +85,50 @@
 </head>
 <body>
     <div class="tracking-window" id="trackingWindow">
-        <!-- <button class="close-btn" onclick="closeTracking()">X</button> -->
         <h2>LoR Tracking Status</h2>
-        <div class="lor-status pending">Professor A: Pending</div>
-        <div class="lor-status verified">Professor B: Verified</div>
-        <div class="lor-status rejected">Professor C: Rejected</div>
+        {% if lor_requests %}
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Faculty</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">University</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Program</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Deadline</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Status</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Date Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in lor_requests %}
+                <tr class="lor-status {{ request.status }}">
+                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.faculty.user.get_full_name }}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.university_name }}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.program_name }}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.deadline|default:"Not specified" }}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">
+                        {% if request.status == 'pending' %}
+                            <span style="color: orange;">Pending</span>
+                        {% elif request.status == 'approved' %}
+                            <span style="color: green;">Approved</span>
+                        {% elif request.status == 'rejected' %}
+                            <span style="color: red;">Rejected</span>
+                        {% elif request.status == 'completed' %}
+                            <span style="color: blue;">Completed</span>
+                        {% else %}
+                            {{ request.status }}
+                        {% endif %}
+                    </td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.created_at|date:"F j, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="lor-status empty">
+            <p>You haven't submitted any LOR requests yet.</p>
+            <a href="{% url 'student_lor' %}" class="apply-btn" style="display: inline-block; margin-top: 15px; text-decoration: none;">Apply for LoR</a>
+        </div>
+    {% endif %}
     </div>
     <div class="sidebar">
         <img src="ssn.png" alt="SSN Logo">

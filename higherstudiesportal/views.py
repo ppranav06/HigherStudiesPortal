@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 
 import logging
 
-from .models import Student, Faculty
+from .models import Student, Faculty, RecommendationRequest
 from .utils.supabase_auth import determine_role_from_email, register_user, get_supabase_uuid
 from .utils.supabase_storage import upload_file_to_bucket
 
@@ -37,13 +37,29 @@ def type_user(request):
 def lor_application_student(request):
     if type_user(request) != 'student':
         raise PermissionDenied()
-    return render(request, 'student/lor_application.html')
+    
+    # Query all faculty members to display in the dropdown
+    faculties = Faculty.objects.all()
+    return render(request, 'student/lor_application.html', {
+        'faculties': faculties
+    })
 
 @login_required
 def lor_tracking_student(request):
     if type_user(request) != 'student':
         raise PermissionDenied()
-    return render(request, 'student/lor_tracking.html')
+    
+    try:
+        # Get the student's recommendation requests
+        student = Student.objects.get(user=request.user)
+
+        lor_requests = RecommendationRequest.objects.filter(student=student).order_by('-created_at')
+        return render(request, 'student/lor_tracking.html', {
+            'lor_requests': lor_requests
+        })
+    except Student.DoesNotExist:
+        messages.error(request, "Student profile not found")
+        return redirect('student_dashboard')
 
 @login_required
 def letter_upload(request):
@@ -205,3 +221,65 @@ def upload_admission_letter(request):
     except Exception as e:
         logger.exception(f"Error in upload_admission_letter: {str(e)}")
         return JsonResponse({"error": str(e)}, status=500)
+
+@login_required
+def submit_lor_request(request):
+    if type_user(request) != 'student':
+        raise PermissionDenied()
+    
+    if request.method == 'POST':
+        try:
+            # Get the student object
+            student = Student.objects.get(user=request.user)
+            
+            # Create LOR requests for each selected faculty
+            for i in range(1, 4):  # For staff 1, 2, 3
+                faculty_id = request.POST.get(f'faculty{i}_id')
+                
+                if faculty_id:  # Only process if faculty was selected
+                    try:
+                        faculty = Faculty.objects.get(id=faculty_id)
+                        
+                        # Check if a request already exists for this student-faculty pair
+                        from .models import RecommendationRequest
+                        existing_request = RecommendationRequest.objects.filter(
+                            student=student,
+                            faculty=faculty,
+                            status__in=['pending', 'approved']
+                        ).exists()
+                        
+                        if existing_request:
+                            messages.warning(request, f"You already have an active LOR request with {faculty.user.get_full_name()}")
+                            continue
+                        
+                        # Get common form data
+                        university_name = request.POST.get('university_name')
+                        program_name = request.POST.get('program_name')
+                        deadline = request.POST.get('deadline')
+                        additional_notes = request.POST.get('additional_notes', '')
+                        
+                        # Create the recommendation request
+                        RecommendationRequest.objects.create(
+                            student=student,
+                            faculty=faculty,
+                            status='pending',
+                            university_name=university_name,
+                            program_name=program_name,
+                            deadline=deadline if deadline else None,
+                            additional_notes=additional_notes
+                        )
+                        
+                        messages.success(request, f"LOR request submitted to {faculty.user.get_full_name()}")
+                    
+                    except Faculty.DoesNotExist:
+                        messages.error(request, f"Selected faculty {faculty_id} not found")
+                    
+            return redirect('lor-tracking')
+            
+        except Student.DoesNotExist:
+            messages.error(request, "Student profile not found")
+        except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+        
+    # If not POST or if there was an error, redirect back to the form
+    return redirect('student_lor')
