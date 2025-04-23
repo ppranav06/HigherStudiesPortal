@@ -276,8 +276,8 @@
     }
   </script> -->
   <script>
-    const supabaseUrl = 'https://hpmicislgpbnccxhcedg.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhwbWljaXNsZ3BibmNjeGhjZWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3MzA4MDYsImV4cCI6MjA1NTMwNjgwNn0.mloWsIdqmBdPKFjpQPmJV6_S63NGB1l9pnMz04FJYR4';
+    const supabaseUrl = process.env.SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
   
     function showPanel(panelId) {
