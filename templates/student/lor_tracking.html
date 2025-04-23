@@ -1,24 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoR Tracking</title>
+{% extends "shared/sidebar.html" %}
+{% load static %}
+
+{% block title %}HigherStudiesPortal | LoR Tracking {% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/common_css.css' %}" />
     <style>
-        body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: white;
-}
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        
         .tracking-window {
             background: white;
             padding: 20px;
@@ -39,7 +25,8 @@
         top: 50%;
         left: calc(50% + 125px); /* Adjust for sidebar width */
         transform: translate(-50%, -50%);
-}
+        z-index: 1; /* Ensure it appears above the sidebar - vibe coded*/
+        }
         .lor-status {
             padding: 10px;
             margin: 10px 0;
@@ -49,41 +36,10 @@
         .pending { background-color: #003C88; color: white;}
         .verified { background-color: #003C88; color: white; }
         .rejected { background-color:#003C88 ; color: white; }
-        /* Sidebar Styling */
-        .sidebar {
-            width: 250px;
-            background-color: #003C88;
-            padding: 20px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            height: 100vh; /* Ensure full height */
-            position: fixed; /* Fix it to the left */
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar img {
-            width: 100%;
-            max-width: 200px; 
-            display: block;
-            margin: 0 auto; 
-        }
-
-        .sidebar a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-}
     </style>
-</head>
-<body>
+{% endblock %}
+
+{% block page_content %}
     <div class="tracking-window" id="trackingWindow">
         <h2>LoR Tracking Status</h2>
         {% if lor_requests %}
@@ -130,13 +86,10 @@
         </div>
     {% endif %}
     </div>
-    <div class="sidebar">
-        <img src="ssn.png" alt="SSN Logo">
-    </div>
     <script>
         function closeTracking() {
             document.getElementById("trackingWindow").style.display = "none";
         }
     </script>
-</body>
-</html>
+
+{% endblock %}

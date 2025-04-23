@@ -24,8 +24,8 @@
                 {% elif faculty_check %}
                     <!-- Faculty Links -->
                     <li><a href="{% url 'faculty_dashboard' %}" style="text-decoration: none; color: white">Dashboard</a></li>
-                    <li><a href="f_student_list.html" style="text-decoration: none; color: white">Student Details</a></li>
-                    <li><a href="f_verify.html" style="text-decoration: none; color: white">Verify</a></li>
+                    <li><a href="{% url 'student_list' %}" style="text-decoration: none; color: white">Student Details</a></li>
+                    <li><a href="{% url 'approveLOR' %}" style="text-decoration: none; color: white">Verify</a></li>
 
                     <!-- Regular user with no role yet -->
 

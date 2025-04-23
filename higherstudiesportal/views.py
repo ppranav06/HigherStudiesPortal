@@ -1,19 +1,24 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 
 import logging
+import json
 
 from .models import Student, Faculty, RecommendationRequest
 from .utils.supabase_auth import determine_role_from_email, register_user, get_supabase_uuid
 from .utils.supabase_storage import upload_file_to_bucket
 
-#@login_required # decorator enforce after auth is set up
+def index(request):
+    return render(request, 'index.html')
+
+######################################################################
+# Validation functions
 
 def type_user(request):
     """Function to get the type of user logged in"""
@@ -33,11 +38,36 @@ def type_user(request):
     print("DEBUG: USER TYPE IS", user_type)
     return user_type
 
+def type_user_with_userobj(user):
+    """Function to get the type of user logged in"""
+    if not user.is_authenticated:
+        return None # support not found yet
+
+    current_user = user
+    try:
+        stud = Student.objects.get(user=current_user)
+        user_type='student' 
+    except Student.DoesNotExist:
+        try:
+            facul = Faculty.objects.get(user=current_user)
+            user_type='faculty'
+        except Faculty.DoesNotExist:
+            user_type = 'notanyofthese'
+    print("DEBUG: USER TYPE IS", user_type)
+    return user_type
+
+def is_faculty(user):
+    return user.is_authenticated and type_user_with_userobj(user) == 'faculty'
+
+def is_student(user):
+    return user.is_authenticated and type_user_with_userobj(user) == 'student'
+
+######################################################################
+# Student Views here
+
 @login_required
+@user_passes_test(is_student)
 def lor_application_student(request):
-    if type_user(request) != 'student':
-        raise PermissionDenied()
-    
     # Query all faculty members to display in the dropdown
     faculties = Faculty.objects.all()
     return render(request, 'student/lor_application.html', {
@@ -45,10 +75,8 @@ def lor_application_student(request):
     })
 
 @login_required
+@user_passes_test(is_student)
 def lor_tracking_student(request):
-    if type_user(request) != 'student':
-        raise PermissionDenied()
-    
     try:
         # Get the student's recommendation requests
         student = Student.objects.get(user=request.user)
@@ -62,41 +90,69 @@ def lor_tracking_student(request):
         return redirect('student_dashboard')
 
 @login_required
+@user_passes_test(is_student)
 def letter_upload(request):
-    if type_user(request) != 'student':
-        raise PermissionDenied()
     return render(request, 'student/cc1.html')
 
 @login_required
+@user_passes_test(is_student)
 def dashboard_student(request):
-    if type_user(request) != 'student':
-        raise PermissionDenied()
     return render(request, 'student/student_dashboard.html')
 
+######################################################################
+# Faculty Views here
+
 @login_required
+@user_passes_test(is_faculty)
 def dashboard_faculty(request):
-    if type_user(request) != 'faculty':
-        raise PermissionDenied()
     return render(request, 'faculty/faculty_dashboard.html')
 
 @login_required
-def f_verify(request):
-    if type_user(request) != 'faculty':
-        raise PermissionDenied()
-    return render(request, 'faculty/f_verify.html')
+@user_passes_test(is_faculty)
+def f_student_list(request):
+    students = Student.objects.all()
+    return render(request, 'faculty/f_student_list.html', {'students': students})
 
 @login_required
-def f_student_list(request):
-    if type_user(request) != 'faculty':
-        raise PermissionDenied()
-    return render(request, 'faculty/f_student_list.html')
+@user_passes_test(is_faculty)
+def approveLOR(request):
+    # Get all LOR requests associated with students
+    lor_requests = RecommendationRequest.objects.select_related('student', 'student__user').all()
+    return render(request, 'faculty/f_verify.html', {'lor_requests': lor_requests})
 
-def index(request):
-    # current_user = request.user
-    # if not current_user:
-        return redirect('/login')
+@login_required
+@user_passes_test(is_faculty)
+@csrf_exempt
+def update_lor_status(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            request_id = data.get('request_id')
+            new_status = data.get('status')
+            
+            if not request_id or not new_status:
+                return JsonResponse({'success': False, 'error': 'Missing required parameters'})
+                
+            # Validate status value
+            if new_status not in ['Pending', 'Verified', 'Rejected']:
+                return JsonResponse({'success': False, 'error': 'Invalid status value'})
+                
+            # Update the LOR request status
+            lor_request = RecommendationRequest.objects.get(id=request_id)
+            lor_request.status = new_status
+            lor_request.save()
+            
+            return JsonResponse({'success': True})
+            
+        except RecommendationRequest.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'LOR request not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
+######################################################################
 # Login and Signup
 # @csrf_exempt
 @csrf_protect
@@ -170,6 +226,12 @@ def logout_view(request):
     return redirect('/accounts/login')
     
 
+######################################################################
+# Main functions: 
+# - Apply LOR / Track status
+# - Upload admission letter
+
+
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -223,9 +285,8 @@ def upload_admission_letter(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 @login_required
+@user_passes_test(is_student)
 def submit_lor_request(request):
-    if type_user(request) != 'student':
-        raise PermissionDenied()
     
     if request.method == 'POST':
         try:

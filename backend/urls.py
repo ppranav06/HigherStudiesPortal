@@ -41,8 +41,9 @@ urlpatterns = [
     path('student/letter-upload', views.letter_upload, name='student_letter-upload'),
     # Faculty routes
     path('faculty/dashboard/', views.dashboard_faculty, name='faculty_dashboard'),
-    path('faculty/f_student_list/', views.f_student_list, name='f_student_list'),
-    path('faculty/f_verify/', views.f_verify, name='f_verify'),
+    path('faculty/students/', views.f_student_list, name='student_list'),
+    path('faculty/approveLOR/', views.approveLOR, name='approveLOR'),
+    path('update_lor_status/', views.update_lor_status, name='update_lor_status'),
     # Upload path
     path('upload_admission_letter/', views.upload_admission_letter, name='upload_admission_letter'),
 ]

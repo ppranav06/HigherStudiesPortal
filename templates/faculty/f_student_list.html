@@ -1,44 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Details</title>
+{% extends 'shared/sidebar.html' %}
+{% load static %}
+
+{% block title %}HigherStudiesPortal | Student Details {% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/common_css.css' %}" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-        .sidebar img {
-            width: 100%;
-            max-width: 200px; 
-            display: block;
-            margin: 0 auto; 
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #003C88;
-            padding: 20px;
-            color: white;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-        }
-
         .content {
             margin-left: 290px;
             padding: 20px;
             width: calc(100% - 290px);
         }
-
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -46,24 +18,21 @@
             border-radius: 8px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
-
+        
         th, td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-
+        
         th {
             background-color: #003C88;
             color: white;
         }
     </style>
-</head>
-<body>
-    <div class="sidebar">
-        <img class="image" src="ssn.png" alt="SSN Logo">
-        <!-- <h2>Faculty Dashboard</h2> -->
-    </div>
+{% endblock %}
+
+{% block page_content %}
     <div class="content">
         <h1>Student Details</h1>
         <table>
@@ -81,63 +50,24 @@
                 </tr>
             </thead>
             <tbody>
+                {% for student in students %}
                 <tr>
-                    <td>Aryan Mehta</td>
-                    <td>2023101</td>
-                    <td>Computer Science</td>
-                    <td>A</td>
-                    <td>3</td>
-                    <td>2026</td>
-                    <td>CS12345</td>
-                    <td>9876543210</td>
-                    <td>aryan.mehta@example.com</td>
+                    <td>{{ student.user.first_name }} {{ student.user.last_name }}</td>
+                    <td>{{ student.register_number }}</td>
+                    <td>{{ student.department }}</td>
+                    <td>{{ student.section }}</td>
+                    <td>{{ student.year }}</td>
+                    <td>{{ student.year_of_passing }}</td>
+                    <td>{{ student.digital_id }}</td>
+                    <td>{{ student.phone_number }}</td>
+                    <td>{{ student.user.email }}</td>
                 </tr>
+                {% empty %}
                 <tr>
-                    <td>Priya Sharma</td>
-                    <td>2023102</td>
-                    <td>Electronics</td>
-                    <td>B</td>
-                    <td>2</td>
-                    <td>2027</td>
-                    <td>ECE56789</td>
-                    <td>9876509876</td>
-                    <td>priya.sharma@example.com</td>
+                    <td colspan="9" style="text-align: center;">No students found.</td>
                 </tr>
-                <tr>
-                    <td>Rahul Verma</td>
-                    <td>2023103</td>
-                    <td>Mechanical</td>
-                    <td>C</td>
-                    <td>4</td>
-                    <td>2025</td>
-                    <td>MECH98765</td>
-                    <td>9876123456</td>
-                    <td>rahul.verma@example.com</td>
-                </tr>
-                <tr>
-                    <td>Neha Kapoor</td>
-                    <td>2023104</td>
-                    <td>Information Technology</td>
-                    <td>A</td>
-                    <td>1</td>
-                    <td>2028</td>
-                    <td>IT24680</td>
-                    <td>9876432109</td>
-                    <td>neha.kapoor@example.com</td>
-                </tr>
-                <tr>
-                    <td>Vikram Reddy</td>
-                    <td>2023105</td>
-                    <td>Civil</td>
-                    <td>B</td>
-                    <td>3</td>
-                    <td>2026</td>
-                    <td>CIV13579</td>
-                    <td>9876598765</td>
-                    <td>vikram.reddy@example.com</td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
-</body>
-</html>
+{% endblock %}
