@@ -14,12 +14,13 @@ from .re_patterns_email import student_pattern,faculty_pattern
 import os
 import re
 
-getURLKEY = lambda: (os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
+getURLKEY = lambda: (os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_ANON_KEY'))
 
 class SupabaseAuthBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         load_dotenv('.env')
         URL, KEY = getURLKEY()
+        print(URL, KEY)
         supabase = create_client(supabase_url=URL, supabase_key=KEY)
         try:
             response = supabase.auth.sign_in_with_password(
