@@ -46,5 +46,7 @@ urlpatterns = [
     path('update_lor_status/', views.update_lor_status, name='update_lor_status'),
     # Upload path
     path('upload_admission_letter/', views.upload_admission_letter, name='upload_admission_letter'),
+    # 
+    path("prioritized-requests/", views.prioritized_requests, name="prioritized_requests"),
 ]
 

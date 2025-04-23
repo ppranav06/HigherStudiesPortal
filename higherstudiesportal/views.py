@@ -14,6 +14,10 @@ from .models import Student, Faculty, RecommendationRequest
 from .utils.supabase_auth import determine_role_from_email, register_user, get_supabase_uuid
 from .utils.supabase_storage import upload_file_to_bucket
 
+from .utils.binomial_heap import BinomialHeap  # adjust import if needed
+from .utils.supabase_auth import supabase
+from datetime import datetime
+
 def index(request):
     return render(request, 'index.html')
 
@@ -344,3 +348,26 @@ def submit_lor_request(request):
         
     # If not POST or if there was an error, redirect back to the form
     return redirect('student_lor')
+
+# binomial heap
+def prioritized_requests(request):
+    response = supabase.table("admission_records").select("*").execute()
+    requests = response.data
+
+    today = datetime.today().date()
+    heap = BinomialHeap()
+
+    for req in requests:
+        admission_str = req.get("admission_date")
+        if not admission_str:
+            continue
+        admission_date = datetime.strptime(admission_str, "%Y-%m-%d").date()
+        days_left = (admission_date - today).days
+        priority = max(days_left, 0)
+        heap.insert(req, priority)
+
+    sorted_requests = []
+    while not heap.is_empty():
+        sorted_requests.append(heap.extract_min())
+
+    return JsonResponse(sorted_requests, safe=False)
