@@ -79,7 +79,7 @@ h2 {
 }
 .input-group input:focus ~ label,
 .input-group input:valid ~ label {
-  top: -5px;
+  top: -10px;
 }
 .remember {
   margin: -5px 0 15px 5px;

@@ -79,9 +79,22 @@ h2 {
   border: none;
   outline: none;
 }
+.input-group select {
+  width: 320px;              /* match input width */
+  height: 40px;              /* match input height */
+  font-size: 16px;
+  color: #fff;
+  padding: 0 5px;
+  background: transparent;   /* match dark theme */
+  border: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;          /* removes default arrow (optional if you're styling it) */
+}
 .input-group input:focus ~ label,
 .input-group input:valid ~ label {
-  top: -5px;
+  top: -10px;
 }
 .remember {
   margin: -5px 0 15px 5px;

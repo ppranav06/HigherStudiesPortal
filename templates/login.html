@@ -14,13 +14,15 @@
             {% csrf_token %}
                 <h2>Login</h2>
                 <div class="input-group">
-                    <label for="email">Email:</label>
-                    <input type="email" name="email" id="email" required>
-                </div>
-                <div class="input-group">
-                    <label for="password">Password:</label>
-                    <input type="password" name="password" id="password" required>
-                </div>
+                    <input type="email" name="email" id="email" required />
+                    <label for="email">Email</label> <!-- moved label below input -->
+                  </div>
+                  
+                  <div class="input-group">
+                    <input type="password" name="password" id="password" required />
+                    <label for="password">Password</label> <!-- moved label below input -->
+                  </div>
+                  
             <button type="submit">Login</button>
         </form>
             <div class="signUp-link">
