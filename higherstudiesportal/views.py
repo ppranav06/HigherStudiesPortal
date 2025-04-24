@@ -8,12 +8,15 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.db import models # for join query equivalents in django's ORM
 from django.http import JsonResponse, HttpResponse
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import User  # Add this import
 
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+import re
+import os
 
-from .models import Student, Faculty, RecommendationRequest
+from .models import Student, Faculty, RecommendationRequest, AdmissionRecord, CourseCompletionRequest
 from .utils.supabase_auth import determine_role_from_email, register_user, get_supabase_uuid
 from .utils.supabase_storage import upload_file_to_bucket
 from .utils.binomial_heap import BinomialHeap  # adjust import if needed
@@ -29,7 +32,7 @@ def index(request):
 def type_user(request):
     """Function to get the type of user logged in"""
     if not request.user.is_authenticated:
-        return None # support not found yet
+        return None
 
     current_user = request.user
     try:
@@ -41,13 +44,13 @@ def type_user(request):
             user_type='faculty'
         except Faculty.DoesNotExist:
             user_type = 'notanyofthese'
-    print("DEBUG: USER TYPE IS", user_type)
+    # print("DEBUG: USER TYPE IS", user_type)
     return user_type
 
 def type_user_with_userobj(user):
     """Function to get the type of user logged in"""
     if not user.is_authenticated:
-        return None # support not found yet
+        return None
 
     current_user = user
     try:
@@ -59,7 +62,7 @@ def type_user_with_userobj(user):
             user_type='faculty'
         except Faculty.DoesNotExist:
             user_type = 'notanyofthese'
-    print("DEBUG: USER TYPE IS", user_type)
+    # print("DEBUG: USER TYPE IS", user_type)
     return user_type
 
 def is_faculty(user):
@@ -67,6 +70,23 @@ def is_faculty(user):
 
 def is_student(user):
     return user.is_authenticated and type_user_with_userobj(user) == 'student'
+
+def is_admin(user):
+    """Check if user's email is in the allowed admin emails list"""
+    admin_emails = os.getenv('ADMIN_EMAILS', '').split(',')
+    admin_emails = [email.strip().lower() for email in admin_emails if email.strip()]
+    
+    # # Debug printing
+    # print("\n=== Admin Check Debug ===")
+    # print(f"User email: {user.email}")
+    # print(f"User email (lowercase): {user.email.lower()}")
+    # print(f"Admin emails from env: {os.getenv('ADMIN_EMAILS')}")
+    # print(f"Processed admin emails: {admin_emails}")
+    # print(f"Is user authenticated: {user.is_authenticated}")
+    # print(f"Is email in admin list: {user.email.lower() in admin_emails}")
+    # print("=======================\n")
+    
+    return user.is_authenticated and user.email.lower() in admin_emails
 
 ######################################################################
 # Student Views here
@@ -105,13 +125,51 @@ def letter_upload(request):
 def dashboard_student(request):
     return render(request, 'student/student_dashboard.html')
 
+@login_required
+@user_passes_test(is_student)
+def verification_tracking_student(request):
+    try:
+        student = Student.objects.get(user=request.user)
+        certificates = AdmissionRecord.objects.filter(student=student).order_by('-created_at')
+        return render(request, 'student/cc_verification.html', {'certificates': certificates})
+    except Student.DoesNotExist:
+        messages.error(request, "Student profile not found")
+        return redirect('student_dashboard')
+
 ######################################################################
 # Faculty Views here
 
 @login_required
 @user_passes_test(is_faculty)
 def dashboard_faculty(request):
-    return render(request, 'faculty/faculty_dashboard.html')
+    try:
+        faculty = Faculty.objects.get(user=request.user)
+        
+        # Get recent LOR requests for this faculty member
+        recent_requests = RecommendationRequest.objects.filter(
+            faculty=faculty
+        ).select_related(
+            'student', 
+            'student__user'
+        ).annotate(
+            student_name=models.functions.Concat(
+                models.F('student__user__first_name'), 
+                models.Value(' '), 
+                models.F('student__user__last_name'),
+                output_field=models.CharField()
+            )
+        ).values(
+            'student_name',
+            'university_name',
+            'status'
+        ).order_by('-created_at')[:5]  # Get only the 5 most recent requests
+        
+        return render(request, 'faculty/faculty_dashboard.html', {
+            'recent_requests': recent_requests
+        })
+    except Faculty.DoesNotExist:
+        messages.error(request, "Faculty profile not found")
+        return redirect('login')
 
 @login_required
 @user_passes_test(is_faculty)
@@ -210,6 +268,12 @@ def login_view(request):
         return render(request, 'login.html', {'error_message': 'Invalid email or password'})
     
     login(request=request, user=user)
+    
+    # Check if user is admin using the is_admin function
+    if is_admin(user):
+        return redirect('admin_dashboard')
+        
+    # For other users, use role-based redirection
     role = determine_role_from_email(email)
     return redirect(request.GET.get('next', f'/{role}/dashboard/'))
 
@@ -228,6 +292,12 @@ def signup_view(request):
         messages.error(request, "Passwords do not match")
         return render(request, 'sign-up.html')
     
+    # Check if trying to create an admin account
+    admin_emails = os.getenv('ADMIN_EMAILS', '').split(',')
+    if email in admin_emails:
+        messages.error(request, "Unauthorized account creation")
+        return render(request, 'sign-up.html')
+    
     role = determine_role_from_email(email)
 
     # Role specific fields are obtained
@@ -236,10 +306,8 @@ def signup_view(request):
     designation = None
 
     if role=='faculty':
-        # designation = request.POST.get('designation')
         designation = 'Associate Professor'
     elif role=='student':
-        # graduation_year = request.POST.get('graduation_year')
         graduation_year = 2027
 
     result = register_user(email=email,
@@ -248,9 +316,7 @@ def signup_view(request):
         department=department,
         graduation_year=graduation_year,
         designation=designation
-    ) 
-    # even if values are hardcoded, this check is again done at supabase_auth backend, so it doesn't matter for now
-    # CHANGE LATER ^^^^^ (fix html)
+    )
 
     if result['success']:
         login(request, result['user'], backend='django.contrib.auth.backends.ModelBackend')
@@ -276,6 +342,7 @@ logger = logging.getLogger(__name__)
 
 @login_required
 @require_POST
+@csrf_protect
 def upload_admission_letter(request):
     user = request.user
     try:
@@ -443,3 +510,77 @@ def prioritized_requests(request):
         sorted_requests.append(heap.extract_min())
 
     return JsonResponse(sorted_requests, safe=False)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    try:
+        # Get statistics
+        total_students = Student.objects.count()
+        pending_verifications = CourseCompletionRequest.objects.filter(status='pending').count()
+
+        # Get recent verification requests
+        recent_verifications = CourseCompletionRequest.objects.select_related(
+            'student__user'
+        ).order_by('-created_at')[:5]
+
+        context = {
+            'total_students': total_students,
+            'pending_verifications': pending_verifications,
+            'recent_verifications': recent_verifications,
+            'user': request.user
+        }
+
+        return render(request, 'admin/admin_dashboard.html', context)
+
+    except Exception as e:
+        print(f"\n=== Admin Dashboard Error ===")
+        print(f"Error: {str(e)}")
+        print("===========================\n")
+        messages.error(request, f"Error loading dashboard: {str(e)}")
+        return redirect('login')
+
+@login_required
+@user_passes_test(is_admin)
+def verify_certificate(request):
+    """View to handle verification of course completion certificates"""
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
+        notes = request.POST.get('notes', '')
+
+        try:
+            completion_request = CourseCompletionRequest.objects.get(id=request_id)
+            
+            if action == 'verify':
+                completion_request.status = 'Verified'
+            elif action == 'reject':
+                completion_request.status = 'Rejected'
+            
+            completion_request.notes = notes
+            completion_request.save()
+            
+            messages.success(request, f"Certificate {action}d successfully")
+        except CourseCompletionRequest.DoesNotExist:
+            messages.error(request, "Certificate request not found")
+        
+        return redirect('admin_dashboard')
+    
+    # Get all pending verification requests
+    pending_requests = CourseCompletionRequest.objects.filter(
+        status='Pending'
+    ).select_related(
+        'student',
+        'student__user'
+    ).order_by('-created_at')
+    
+    return render(request, 'admin/verify_certificate.html', {
+        'pending_requests': pending_requests
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def admin_student_list(request):
+    """View to display list of all students for admin"""
+    students = Student.objects.select_related('user').all()
+    return render(request, 'admin/student_list.html', {'students': students})

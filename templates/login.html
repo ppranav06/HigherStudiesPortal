@@ -1,33 +1,91 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title%} HigherStudiesPortal | Login {% endblock %}
-{% block head %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loginpage.css' %}">
-    <script src="{% static 'js/login.js' %}"></script>
+{% block title %}HigherStudiesPortal | Login{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" type="text/css" href="{% static '/css/loginpage.css' %}">
+<style>
+/* Fallback styles in case the CSS file doesn't load */
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+}
+
+.login-box {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 60, 136, 0.12);
+    padding: 40px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #003C88;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="wrapper">
-        <div class="form-wrapper sign-in">
-            <form method="POST" action ="{% url 'login' %}">
-            {% csrf_token %}
-                <h2>Login</h2>
-                <div class="input-group">
-                    <input type="email" name="email" id="email" required />
-                    <label for="email">Email</label> <!-- moved label below input -->
-                  </div>
-                  
-                  <div class="input-group">
-                    <input type="password" name="password" id="password" required />
-                    <label for="password">Password</label> <!-- moved label below input -->
-                  </div>
-                  
-            <button type="submit">Login</button>
-        </form>
-            <div class="signUp-link">
-                <p>Don't have an account ? <a href="{% url 'sign-up' %}" class="signUpBtn-link">Sign Up </a></a></p>
-            </div>
+<div class="login-container">
+    <div class="login-box">
+        <div class="login-header">
+            <img src="{% static 'images/ssn.png' %}" alt="SSN Logo" class="login-logo">
+            <h1>Higher Studies Portal</h1>
         </div>
+
+        {% if error_message %}
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'login' %}" class="login-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" required placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required placeholder="Enter your password">
+            </div>
+            
+            <button type="submit" class="login-button">Login</button>
+
+            <div class="signup-link">
+                Don't have an account? <a href="{% url 'sign-up' %}">Sign Up</a>
+            </div>
+        </form>
     </div>
+</div>
 {% endblock %}

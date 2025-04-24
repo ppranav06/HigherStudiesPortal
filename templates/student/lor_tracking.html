@@ -4,92 +4,50 @@
 {% block title %}HigherStudiesPortal | LoR Tracking {% endblock %}
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/common_css.css' %}" />
-    <style>
-        .tracking-window {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            width: 350px;
-            text-align: center;
-            position: relative;
-        }
-        .tracking-window {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        width: 350px;
-        text-align: center;
-        position: absolute;
-        top: 50%;
-        left: calc(50% + 125px); /* Adjust for sidebar width */
-        transform: translate(-50%, -50%);
-        z-index: 1; /* Ensure it appears above the sidebar - vibe coded*/
-        }
-        .lor-status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .pending { background-color: #003C88; color: white;}
-        .verified { background-color: #003C88; color: white; }
-        .rejected { background-color:#003C88 ; color: white; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/lor_tracking.css' %}" />
 {% endblock %}
 
 {% block page_content %}
-    <div class="tracking-window" id="trackingWindow">
-        <h2>LoR Tracking Status</h2>
-        {% if lor_requests %}
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <thead>
-                <tr>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Faculty</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">University</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Program</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Deadline</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Status</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Date Submitted</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for request in lor_requests %}
-                <tr class="lor-status {{ request.status }}">
-                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.faculty.user.get_full_name }}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.university_name }}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.program_name }}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.deadline|default:"Not specified" }}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">
-                        {% if request.status == 'pending' %}
-                            <span style="color: orange;">Pending</span>
-                        {% elif request.status == 'approved' %}
-                            <span style="color: green;">Approved</span>
-                        {% elif request.status == 'rejected' %}
-                            <span style="color: red;">Rejected</span>
-                        {% elif request.status == 'completed' %}
-                            <span style="color: blue;">Completed</span>
-                        {% else %}
-                            {{ request.status }}
-                        {% endif %}
-                    </td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">{{ request.created_at|date:"F j, Y" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="lor-status empty">
-            <p>You haven't submitted any LOR requests yet.</p>
-            <a href="{% url 'student_lor' %}" class="apply-btn" style="display: inline-block; margin-top: 15px; text-decoration: none;">Apply for LoR</a>
+    <div class="main-content">
+        <div class="tracking-window">
+            <h2>LoR Tracking Status</h2>
+            {% if lor_requests %}
+            <div class="table-responsive">
+                <table class="tracking-table">
+                    <thead>
+                        <tr>
+                            <th>Faculty</th>
+                            <th>University</th>
+                            <th>Program</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Date Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in lor_requests %}
+                        <tr>
+                            <td>{{ request.faculty.user.get_full_name }}</td>
+                            <td>{{ request.university_name }}</td>
+                            <td>{{ request.program_name }}</td>
+                            <td>{{ request.deadline|default:"Not specified" }}</td>
+                            <td>
+                                <span class="status-badge {{ request.status }}">
+                                    {{ request.status|title }}
+                                </span>
+                            </td>
+                            <td>{{ request.created_at|date:"F j, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>You haven't submitted any LOR requests yet.</p>
+                <a href="{% url 'student_lor' %}" class="apply-btn">Apply for LoR</a>
+            </div>
+            {% endif %}
         </div>
-    {% endif %}
     </div>
-    <script>
-        function closeTracking() {
-            document.getElementById("trackingWindow").style.display = "none";
-        }
-    </script>
-
 {% endblock %}

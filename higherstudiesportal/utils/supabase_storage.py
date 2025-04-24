@@ -13,6 +13,8 @@ from datetime import datetime
 import uuid
 import logging
 
+from higherstudiesportal.models import Student, Faculty, AdmissionRecord
+
 getURLSERVICEKEY = lambda: (settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY)
 
 def get_file_path(file_object, bucket_name, student_id):
@@ -58,6 +60,17 @@ def insert_record_fileupload(supabaseClient,
             'admission_date': admission_date,
             'letter_file_path': file_path
         })
+        
+        django_db_addrecord = AdmissionRecord(
+            student_id=student_id,
+            university_name=university_name,
+            program_name=program_name,
+            admission_date=admission_date,
+            letter_file_path=file_path
+        )
+        django_db_addrecord.save()
+
+        # Now insert into Supabase
         db_response = supabaseClient.table('admission_records').insert({
             'student_id': student_id,
             'university_name': university_name,

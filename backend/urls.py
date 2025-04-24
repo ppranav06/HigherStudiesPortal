@@ -25,7 +25,7 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 urlpatterns = [
     path('', views.index, name='index'),
     # Django admin
-    path('admin/', admin.site.urls),
+    path('django-admin/', admin.site.urls),
     # Favicon
     re_path(r'^favicon\.ico$', favicon_view),
     # Login page
@@ -39,11 +39,16 @@ urlpatterns = [
     path('student/lor/submit/', views.submit_lor_request, name='submit_lor_request'),
     path('student/lor-tracking/', views.lor_tracking_student, name='lor-tracking'),
     path('student/letter-upload', views.letter_upload, name='student_letter-upload'),
+    path('student/verification-tracking/', views.verification_tracking_student, name='verification-tracking'),
     # Faculty routes
     path('faculty/dashboard/', views.dashboard_faculty, name='faculty_dashboard'),
     path('faculty/students/', views.f_student_list, name='student_list'),
     path('faculty/approveLOR/', views.approveLOR, name='approveLOR'),
     path('faculty/update_lor_status/', views.update_lor_status, name='update_lor_status'),
+    # Admin routes (custom admin interface)
+    path('portal-admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('portal-admin/verification/', views.verify_certificate, name='verify_certificate'),
+    path('portal-admin/students/', views.admin_student_list, name='admin_student_list'),
     # Upload path
     path('upload_admission_letter/', views.upload_admission_letter, name='upload_admission_letter'),
     # 

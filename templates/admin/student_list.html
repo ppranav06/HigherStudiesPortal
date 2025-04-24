@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HigherStudiesPortal | Student List{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+<style>
+    .student-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .student-table th,
+    .student-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .student-table th {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 500;
+    }
+
+    .student-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .student-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .search-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .search-box:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(0, 60, 136, 0.1);
+    }
+
+    .search-box::placeholder {
+        color: #999;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{% static 'images/ssn.png' %}" alt="SSN Logo">
+        </div>
+        <nav>
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'admin_student_list' %}" class="active">Student Details</a>
+            <a href="{% url 'verify_certificate' %}">Verify</a>
+        </nav>
+        <div class="user-info">
+            {{ user.email }}
+        </div>
+        <div class="logout-section">
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2 class="heading1">Student Details</h2>
+            <span>{{ user.email }}</span>
+        </div>
+
+        <div class="welcome-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-box" placeholder="Search students by name, register number, department, or email...">
+            </div>
+            
+            <div class="table-container">
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Register Number</th>
+                            <th>Department</th>
+                            <th>Year</th>
+                            <th>Email ID</th>
+                            <th>Phone Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.user.first_name }} {{ student.user.last_name }}</td>
+                            <td>{{ student.register_number }}</td>
+                            <td>{{ student.department }}</td>
+                            <td>{{ student.year }}</td>
+                            <td>{{ student.user.email }}</td>
+                            <td>{{ student.phone_number }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No students found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    var input = this.value.toLowerCase();
+    var rows = document.querySelectorAll('.student-table tbody tr');
+    
+    rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %} 

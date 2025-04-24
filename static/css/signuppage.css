@@ -1,178 +1,176 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
+
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: #000;
-}
-.wrapper {
-  position: relative;
-  min-width: 450px;
-  min-height: 400px;
-  width: fit-content;
-  height: fit-content;
-  background: #000;
-  box-shadow: 0 0 50px rgb(0, 237, 250);
-  border-radius: 20px;
-  padding: 40px;
-  overflow: hidden;
+    min-height: 100vh;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@keyframes animate {
-  100% {
-    filter: hue-rotate(360deg);
-  }
-}
-.form-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  transition: 1s ease-in-out;
-}
-.wrapper.active .form-wrapper.sign-in {
-  transform: translateY(-450px);
-}
-.wrapper .form-wrapper.sign-up {
-  position: absolute;
-  top: 450px;
-  left: 0;
-}
-.wrapper.active .form-wrapper.sign-up {
-  transform: translateY(-450px);
-}
-h2 {
-  font-size: 30px;
-  color: #fff;
-  text-align: center;
-}
-.input-group {
-  position: relative;
-  margin: 30px 0;
-  border-bottom: 2px solid #fff;
-}
-.input-group label {
-  position: absolute;
-  top: 50%;
-  left: 5px;
-  transform: translateY(-50%);
-  font-size: 16px;
-  color: #fff;
-  pointer-events: none;
-  transition: 0.5s;
-}
-.input-group input {
-  width: 320px;
-  height: 40px;
-  font-size: 16px;
-  color: #fff;
-  padding: 0 5px;
-  background: transparent;
-  border: none;
-  outline: none;
-}
-.input-group select {
-  width: 320px;              /* match input width */
-  height: 40px;              /* match input height */
-  font-size: 16px;
-  color: #fff;
-  padding: 0 5px;
-  background: transparent;   /* match dark theme */
-  border: none;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;          /* removes default arrow (optional if you're styling it) */
-}
-.input-group input:focus ~ label,
-.input-group input:valid ~ label {
-  top: -10px;
-}
-.remember {
-  margin: -5px 0 15px 5px;
-}
-.remember label {
-  color: #fff;
-  font-size: 14px;
-}
-.remember label input {
-  accent-color: #0ef;
-}
-button {
-  position: relative;
-  width: 100%;
-  height: 40px;
-  background: #0ef;
-  box-shadow: 0 0 10px #0ef;
-  font-size: 16px;
-  color: #000;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 30px;
-  border: none;
-  outline: none;
-}
-.signUp-link {
-  font-size: 14px;
-  text-align: center;
-  margin: 15px 0;
-}
-.signUp-link p {
-  color: #fff;
-}
-.signUp-link p a {
-  color: #0ef;
-  text-decoration: none;
-  font-weight: 500;
-}
-.signUp-link p a:hover {
-  text-decoration: underline;
+.signup-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    filter: drop-shadow(0 20px 40px rgba(0, 60, 136, 0.15));
 }
 
-/* Messages styling - completely outside the wrapper */
+.signup-box {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 60, 136, 0.12);
+    padding: 40px;
+}
+
+.signup-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.signup-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.signup-header h1 {
+    color: #003C88;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.error-message {
+    background-color: #ffe6e6;
+    color: #dc3545;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.signup-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    background-color: white;
+    color: #333;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #003C88;
+    box-shadow: 0 0 0 2px rgba(0, 60, 136, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group select::placeholder {
+    color: #999;
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 15px;
+    padding-right: 45px;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #003C88;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.signup-button:hover {
+    background-color: #002a5f;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #003C88;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
 .messages {
-  position: absolute;
-  bottom: 10px; /* Reduced from 50px to move it further down */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 450px;
-  color: #fff;
-  text-align: center;
-  z-index: 90;
-}
-
-/* If the above doesn't create enough separation, you could try this alternative */
-/* Alternative approach: position below the form instead of absolute positioning */
-.messages-alt {
-  width: 100%;
-  color: #fff;
-  text-align: center;
-  z-index: 90;
-  margin-top: 20px; /* Add space between form and messages */
+    margin-top: 20px;
 }
 
 .alert {
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  background-color: rgba(0, 237, 250, 0.2);
-  box-shadow: 0 0 10px rgba(0, 237, 250, 0.5);
-}
-
-.alert-success {
-  background-color: rgba(0, 255, 0, 0.2);
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
 }
 
 .alert-error {
-  background-color: rgba(255, 0, 0, 0.2);
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    background-color: #ffe6e6;
+    color: #dc3545;
+}
+
+.alert-success {
+    background-color: #e6ffe6;
+    color: #28a745;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .signup-container {
+        padding: 10px;
+    }
+    
+    .signup-box {
+        padding: 20px;
+    }
 }

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HigherStudiesPortal | Certificate Verification{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+<style>
+    .verification-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .verification-table th {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px;
+        text-align: left;
+    }
+
+    .verification-table td {
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .verification-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-select {
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .update-btn {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .update-btn:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .pending-badge {
+        background-color: var(--warning-color);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{% static 'images/ssn.png' %}" alt="SSN Logo">
+        </div>
+        <nav>
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'admin_student_list' %}">Student Details</a>
+            <a href="{% url 'verify_certificate' %}" class="active">Verify</a>
+        </nav>
+        <div class="user-info">
+            {{ user.email }}
+        </div>
+        <div class="logout-section">
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2 class="heading1">Certificate Verification</h2>
+            <span>{{ user.email }}</span>
+        </div>
+
+        <div class="welcome-section">
+            <h2>Student Certificate Requests</h2>
+            
+            {% if pending_requests %}
+            <div class="table-container">
+                <table class="verification-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Student ID</th>
+                            <th>Status</th>
+                            <th>Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in pending_requests %}
+                        <tr>
+                            <td>{{ request.student.user.first_name }} {{ request.student.user.last_name }}</td>
+                            <td>{{ request.student.id }}</td>
+                            <td><span class="pending-badge">pending</span></td>
+                            <td>
+                                <form method="post" style="display: flex; align-items: center;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="request_id" value="{{ request.id }}">
+                                    <select name="action" class="status-select">
+                                        <option value="pending">Pending</option>
+                                        <option value="verify">Verify</option>
+                                        <option value="reject">Reject</option>
+                                    </select>
+                                    <button type="submit" class="update-btn">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="table-container" style="text-align: center; padding: 20px;">
+                <p>No pending certificate verification requests.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

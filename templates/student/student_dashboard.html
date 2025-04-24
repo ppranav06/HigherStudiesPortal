@@ -6,11 +6,66 @@
     <div class="content">
         <div class="header">
             <!-- <img src="logo.png" alt="SSN Logo"> -->
-            <h2 class="heading1" >Higher Studies Portal</h2>
-            <span>user</span>
+            <h2 class="heading1">Higher Studies Portal</h2>
+            <span>{{ request.user.email }}</span>
         </div>
-        <h1>Welcome to the Higher Studies Portal</h1>
-        <p>Select an option from the menu to proceed.</p>
+        
+        <div class="welcome-section">
+            <h1>Welcome to the Higher Studies Portal</h1>
+            <p>Select an option from the menu to proceed with your higher studies application process:</p>
+            
+            <!-- Main Actions Row -->
+            <div class="dashboard-row">
+                <!-- LOR Application Card -->
+                <div class="option-card">
+                    <h3>Letter of Recommendation</h3>
+                    <p>Apply for new LOR requests from faculty members.</p>
+                    <a href="{% url 'student_lor' %}" class="dashboard-link">Apply for LOR</a>
+                </div>
+                
+                <!-- Course Completion Card -->
+                <div class="option-card">
+                    <h3>Course Completion</h3>
+                    <p>Upload your course completion certificates.</p>
+                    <a href="{% url 'student_letter-upload' %}" class="dashboard-link">Upload Certificate</a>
+                </div>
+            </div>
+
+            <!-- Tracking Options Row -->
+            <div class="dashboard-row">
+                <!-- LOR Tracking Card -->
+                <div class="option-card">
+                    <h3>LOR Tracking</h3>
+                    <p>Track the status of your submitted LOR requests.</p>
+                    <a href="{% url 'lor-tracking' %}" class="dashboard-link">Track Requests</a>
+                </div>
+                
+                <!-- Verification Tracking Card -->
+                <div class="option-card">
+                    <h3>Verification Status</h3>
+                    <p>Track the verification status of your certificates.</p>
+                    <a href="{% url 'verification-tracking' %}" class="dashboard-link">Check Status</a>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <style>
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-row:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 {% endblock %}

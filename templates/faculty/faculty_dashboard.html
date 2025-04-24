@@ -1,36 +1,103 @@
 {% extends 'shared/sidebar.html' %}
+{% block title %}HigherStudiesPortal | Faculty Dashboard {% endblock %}
+
 {% load static %}
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Higher Studies Portal</title>
-    <link rel= "stylesheet" href="{% static 'css/common_css.css' %}" /> 
-</head> -->
-<!-- <body>
-    <div class="sidebar">
-        {% load static %}
-        <img class="image" src="{% static 'images/ssn.png' %}" alt="SSN Logo">
-        <ul>
-            <li><a href="{% url 'faculty_dashboard' %}" style="text-decoration: none; color: white">Dashboard</a></li>
-            <li><a href="f_student_list.html" style="text-decoration: none; color: white"> Student Details</a></li>
-            <li><a href="f_verify.html" style="text-decoration: none; color: white"> Verify </a></li>
-        </ul>
-    </div> -->
-
 {% block page_content %}
     <div class="content">
         <div class="header">
-            <!-- <img src="logo.png" alt="SSN Logo"> -->
-            <h2 class="heading1" >Higher Studies Portal</h2>
-            <span>user</span>
+            <h2 class="heading1">Higher Studies Portal</h2>
+            <span>{{ request.user.email }}</span>
         </div>
-        <h1>Welcome to the Higher Studies Portal</h1>
-        <p>Select an option from the menu to proceed.</p>
-    </div>
-{% endblock %}
+        
+        <div class="welcome-section">
+            <h1>Welcome to the Faculty Dashboard</h1>
+            <p>Manage student recommendations and verify documents through the following options:</p>
+            
+            <div class="dashboard-options">
+                <div class="option-card">
+                    <h3>Student Details</h3>
+                    <p>View and manage student information and their higher studies applications.</p>
+                    <a href="{% url 'student_list' %}" class="dashboard-link">View Students</a>
+                </div>
+                
+                <div class="option-card">
+                    <h3>LOR Verification</h3>
+                    <p>Review and process Letter of Recommendation requests from students.</p>
+                    <a href="{% url 'approveLOR' %}" class="dashboard-link">Verify LORs</a>
+                </div>
 
-<!-- </body>
-</html> -->
+                <div class="option-card">
+                    <h3>Recent Activity</h3>
+                    <p>Quick overview of recent LOR requests and verifications.</p>
+                    <div class="recent-activity">
+                        {% if recent_requests %}
+                            <ul class="activity-list">
+                                {% for request in recent_requests %}
+                                <li>
+                                    <span class="activity-status {{ request.status|lower }}">{{ request.status }}</span>
+                                    {{ request.student_name }} - {{ request.university_name }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="no-activity">No recent activity to display</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .recent-activity {
+            margin-top: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .activity-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 8px;
+            color: white;
+        }
+        
+        .activity-status.pending {
+            background-color: #ffc107;
+        }
+        
+        .activity-status.approved {
+            background-color: #28a745;
+        }
+        
+        .activity-status.rejected {
+            background-color: #dc3545;
+        }
+        
+        .no-activity {
+            color: #666;
+            font-style: italic;
+            margin: 0;
+        }
+    </style>
+{% endblock %}

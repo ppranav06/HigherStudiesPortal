@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from supabase.client import create_client
 from dotenv import load_dotenv
 from higherstudiesportal.models import Student, Faculty, SupabaseUser
-from .re_patterns_email import student_pattern,faculty_pattern
+from .re_patterns_email import student_pattern, faculty_pattern, admin_pattern
 
 import os
 import re
@@ -20,6 +20,8 @@ def get_supabase_client():
     """Creates the client and returns the client object"""
     load_dotenv('.env')
     URL, KEY = getURLKEY()
+    # print(f"Debug - Supabase URL: {URL}")
+    # print(f"Debug - Supabase Key exists: {bool(KEY)}")
     supabase = create_client(supabase_url=URL, supabase_key=KEY)
     return supabase
 
@@ -73,8 +75,23 @@ class SupabaseAuthBackend(BaseBackend):
             return None
 
 def determine_role_from_email(email):
-    """Determine if the email belongs to a student or faculty"""
-    if re.match(student_pattern, email):
+    """Determine if the email belongs to a student, faculty, or admin"""
+    # Load environment variables
+    load_dotenv()
+    
+    # First check if email is in ADMIN_EMAILS
+    admin_emails = os.getenv('ADMIN_EMAILS', '').split(',')
+    admin_emails = [e.strip() for e in admin_emails if e.strip()]  # Clean the email list
+    
+    # print(f"Debug - Email being checked: {email}")
+    # print(f"Debug - Admin emails from env: {admin_emails}")
+    # print(f"Debug - Matches student pattern: {bool(re.match(student_pattern, email))}")
+    # print(f"Debug - Matches faculty pattern: {bool(re.match(faculty_pattern, email))}")
+    # print(f"Debug - Is in admin emails: {email in admin_emails}")
+    
+    if email in admin_emails:
+        return 'admin'
+    elif re.match(student_pattern, email):
         return 'student'
     elif re.match(faculty_pattern, email):
         return 'faculty'
@@ -88,6 +105,12 @@ def register_user(email, password, full_name, department=None, graduation_year=N
     
     # Determine role from email
     role = determine_role_from_email(email)
+    
+    if role == 'unknown':
+        return {
+            "success": False,
+            "error": "Invalid email format"
+        }
     
     # Sign up with Supabase
     try:
@@ -143,8 +166,8 @@ def register_user(email, password, full_name, department=None, graduation_year=N
                 graduation_year=graduation_year
             )
             
-        # Insert into Supabase
         elif role == 'faculty':
+            # Insert into Supabase
             profile_data = {
                 "id": supabase_uuid, 
                 "email": email,
@@ -160,6 +183,22 @@ def register_user(email, password, full_name, department=None, graduation_year=N
                 department=department,
                 designation=designation
             )
+        
+        elif role == 'admin':
+            # For admin, we only need the basic user account
+            # No additional profile needed
+            django_user.is_staff = True
+            django_user.is_superuser = True
+            django_user.save()
+            
+            # Insert into Supabase admin table if needed
+            profile_data = {
+                "id": supabase_uuid,
+                "email": email,
+                "full_name": full_name,
+                "department": department
+            }
+            supabase.table('admin').insert(profile_data).execute()
         
         return {
             "success": True,

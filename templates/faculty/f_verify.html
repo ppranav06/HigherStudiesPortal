@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block title %}HigherStudiesPortal | LoR Approval {% endblock %}
-{% block head %}
-    <link rel="stylesheet" href="{% static 'css/common_css.css' %}" />
+{% block additional_css %}
+    {{ block.super }}
     <style>
         .content {
             margin-left: 290px; 
@@ -99,6 +99,8 @@
         </table>
     </div>
 
+    {% block extra_js %}
+    {{ block.super }}
     <script>
         function updateStatus(button) {
             let row = button.parentElement.parentElement;
@@ -152,5 +154,6 @@
             return cookieValue;
         }
     </script>
+    {% endblock %}
 {% endblock %}
 

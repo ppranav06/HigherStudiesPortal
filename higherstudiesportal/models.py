@@ -2,6 +2,7 @@ from django.db import models
 # from django.contrib.auth.models import AbstractUser
 import uuid
 from django.contrib.auth.models import User
+
 class SupabaseUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     supabase_uuid = models.UUIDField(unique=True)
@@ -56,3 +57,21 @@ class AdmissionRecord(models.Model):
     letter_file_path = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class CourseCompletionRequest(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    certificate_file = models.FileField(upload_to='course_certificates/')
+    status = models.CharField(max_length=20, choices=[
+        ('Pending', 'Pending'),
+        ('Verified', 'Verified'),
+        ('Rejected', 'Rejected')
+    ], default='Pending')
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.student.user.get_full_name()} - {self.status}"
+
+    class Meta:
+        ordering = ['-created_at']

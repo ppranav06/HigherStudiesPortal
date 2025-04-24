@@ -1,279 +1,261 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard</title>
-  <style>
-    body {
-      display: flex;
-      background-color: white;
-      margin: 0;
-      font-family: Arial, sans-serif;
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HigherStudiesPortal | Admin Dashboard{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+<style>
+    .welcome-section h1 {
+        font-size: 32px;
+        color: var(--primary-color);
+        margin-bottom: 15px;
     }
 
-    .sidebar {
-      width: 250px;
-      background-color: #003C88;
-      padding: 20px;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
+    .welcome-section p {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 40px;
     }
 
-    .sidebar img {
-      width: 100%;
-      max-width: 200px;
-      display: block;
-      margin: 0 auto 30px;
+    .dashboard-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
     }
 
-    .sidebar a {
-      text-decoration: none;
-      color: white;
-      font-size: 16px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 5px;
-      cursor: pointer;
+    .option-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .content {
-      margin-left: 270px;
-      padding: 20px;
-      width: calc(100% - 270px);
+    .option-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .form-group {
-      margin-bottom: 15px;
+    .option-card h3 {
+        font-size: 24px;
+        color: var(--primary-color);
+        margin-bottom: 15px;
     }
 
-    label {
-      display: block;
-      margin-bottom: 5px;
+    .option-card p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 25px;
+        line-height: 1.5;
     }
 
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+    .stat-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #003C88;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    .stat-label {
+        font-size: 16px;
+        color: #555;
     }
 
-    button:hover {
-      background-color: #001f4d;
+    .stat-value {
+        font-size: 28px;
+        color: var(--primary-color);
+        font-weight: bold;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
+    .dashboard-link {
+        display: inline-block;
+        width: 100%;
+        padding: 15px 20px;
+        background-color: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+        transition: background-color 0.3s;
     }
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
+    .dashboard-link:hover {
+        background-color: var(--secondary-color);
     }
 
-    .download-btn {
-      padding: 8px 14px;
-      font-size: 14px;
-      border: none;
-      background-color: green;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-      text-decoration: none;
+    .recent-activity {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .download-btn:hover {
-      background-color: darkgreen;
+    .recent-activity h2 {
+        font-size: 24px;
+        color: var(--primary-color);
+        margin-bottom: 25px;
     }
-  </style>
-</head>
-<body>
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <img src="ssn.png" alt="SSN Logo" />
-    <a onclick="showPanel('addProfessorPanel')">Add Professor</a>
-    <a onclick="showPanel('removeProfessorPanel')">Remove Professor</a>
-    <a onclick="showPanel('requestsPanel')">View Requests</a>
-  </div>
 
-  <!-- Content Panels -->
-  <div class="content">
-    <!-- Add Professor -->
-    <div id="addProfessorPanel" style="display: none;">
-      <h2>Add Professor</h2>
-      <div class="form-group">
-        <label for="profName">Name:</label>
-        <input type="text" id="profName" />
-      </div>
-      <div class="form-group">
-        <label for="profEmail">Email:</label>
-        <input type="email" id="profEmail" />
-      </div>
-      <div class="form-group">
-        <label for="profDept">Department:</label>
-        <input type="text" id="profDept" />
-      </div>
-      <button onclick="addProfessor()">Add Professor</button>
+    .table-container {
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    .table-container table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-container th {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px 20px;
+        text-align: left;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .table-container td {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 15px;
+    }
+
+    .table-container tr:last-child td {
+        border-bottom: none;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 40px 20px;
+        font-size: 18px;
+        color: #666;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .status-badge.pending {
+        background-color: var(--warning-color);
+        color: white;
+    }
+
+    .status-badge.verified {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .status-badge.rejected {
+        background-color: var(--danger-color);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{% static 'images/ssn.png' %}" alt="SSN Logo">
+        </div>
+        <nav>
+            <a href="{% url 'admin_dashboard' %}" class="active">Dashboard</a>
+            <a href="{% url 'admin_student_list' %}">Student Details</a>
+            <a href="{% url 'verify_certificate' %}">Verify</a>
+        </nav>
+        <div class="user-info">
+            {{ user.email }}
+        </div>
+        <div class="logout-section">
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
     </div>
 
-    <!-- Remove Professor -->
-    <div id="removeProfessorPanel" style="display: none;">
-      <h2>Remove Professor</h2>
-      <div class="form-group">
-        <label for="profSelect">Select Professor:</label>
-        <select id="profSelect"></select>
-      </div>
-      <button onclick="removeProfessor()">Remove Selected</button>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2 class="heading1">Higher Studies Portal</h2>
+            <span>{{ user.email }}</span>
+        </div>
+        
+        <div class="welcome-section">
+            <h1>Welcome to the Admin Dashboard</h1>
+            <p>Manage students and verify certificates through the following options:</p>
+            
+            <div class="dashboard-row">
+                <!-- Student Management Card -->
+                <div class="option-card">
+                    <h3>Student Management</h3>
+                    <p>View and manage student details and records.</p>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Students:</span>
+                        <span class="stat-value">{{ total_students }}</span>
+                    </div>
+                    <a href="{% url 'admin_student_list' %}" class="dashboard-link">View Students</a>
+                </div>
+                
+                <!-- Certificate Verification Card -->
+                <div class="option-card">
+                    <h3>Certificate Verification</h3>
+                    <p>Verify student certificates and documents.</p>
+                    <div class="stat-info">
+                        <span class="stat-label">Pending Verifications:</span>
+                        <span class="stat-value">{{ pending_verifications }}</span>
+                    </div>
+                    <a href="{% url 'verify_certificate' %}" class="dashboard-link">Verify Certificates</a>
+                </div>
+            </div>
+
+            <!-- Recent Verifications Section -->
+            <div class="recent-activity">
+                <h2>Recent Certificate Verifications</h2>
+                <div class="table-container">
+                    {% if recent_verifications %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Certificate Type</th>
+                                <th>Submission Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in recent_verifications %}
+                            <tr>
+                                <td>{{ request.student.user.first_name }} {{ request.student.user.last_name }}</td>
+                                <td>{{ request.certificate_type }}</td>
+                                <td>{{ request.created_at|date:"M d, Y" }}</td>
+                                <td><span class="status-badge {{ request.status|lower }}">{{ request.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="empty-message">
+                        No recent verification requests
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Course Completion Requests -->
-    <div id="requestsPanel" style="display: none;">
-      <h2>Course Completion Requests</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Certificate</th>
-          </tr>
-        </thead>
-        <tbody id="requestsTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Supabase & Script -->
-  <script src="https://unpkg.com/@supabase/supabase-js"></script>
-  <script>
-    const supabaseUrl = 'https://your-project-id.supabase.co';
-    const supabaseKey = 'your-anon-public-key';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    function showPanel(panelId) {
-      const panels = ['addProfessorPanel', 'removeProfessorPanel', 'requestsPanel'];
-      panels.forEach(id => {
-        document.getElementById(id).style.display = (id === panelId) ? 'block' : 'none';
-      });
-
-      if (panelId === 'removeProfessorPanel') loadProfessorList();
-      if (panelId === 'requestsPanel') loadRequests();
-    }
-
-    async function addProfessor() {
-      const name = document.getElementById("profName").value.trim();
-      const email = document.getElementById("profEmail").value.trim();
-      const dept = document.getElementById("profDept").value.trim();
-
-      if (!name || !email || !dept) {
-        alert("Fill in all fields.");
-        return;
-      }
-
-      const { error } = await supabase.from("professors").insert([{ name, email, department: dept }]);
-      if (error) {
-        console.error(error);
-        alert("Error adding professor.");
-      } else {
-        alert("✅ Professor added.");
-        document.getElementById("profName").value = "";
-        document.getElementById("profEmail").value = "";
-        document.getElementById("profDept").value = "";
-      }
-    }
-
-    async function loadProfessorList() {
-      const { data, error } = await supabase.from("professors").select("*");
-      const select = document.getElementById("profSelect");
-      select.innerHTML = "";
-
-      if (data) {
-        data.forEach(prof => {
-          const option = document.createElement("option");
-          option.value = prof.id; // assuming primary key is 'id'
-          option.textContent = `${prof.name} (${prof.email})`;
-          select.appendChild(option);
-        });
-      } else {
-        console.error(error);
-      }
-    }
-
-    async function removeProfessor() {
-      const profId = document.getElementById("profSelect").value;
-      const { error } = await supabase.from("professors").delete().eq("id", profId);
-      if (error) {
-        alert("Failed to remove professor.");
-        console.error(error);
-      } else {
-        alert("✅ Professor removed.");
-        loadProfessorList();
-      }
-    }
-
-    async function loadRequests() {
-      const { data, error } = await supabase.from("cc_requests").select("*");
-      const tbody = document.getElementById("requestsTable");
-      tbody.innerHTML = "";
-
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      data.forEach(req => {
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-          <td>${req.name}</td>
-          <td>${req.email}</td>
-          <td>
-            <select onchange="updateStatus(${req.id}, this.value)">
-              <option value="Pending" ${req.status === "Pending" ? "selected" : ""}>Pending</option>
-              <option value="Approved" ${req.status === "Approved" ? "selected" : ""}>Approved</option>
-              <option value="Rejected" ${req.status === "Rejected" ? "selected" : ""}>Rejected</option>
-            </select>
-          </td>
-          <td>
-            <a class="download-btn" href="https://your-project-id.supabase.co/storage/v1/object/public/your-bucket/${req.file_path}" target="_blank">Download</a>
-          </td>
-        `;
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    async function updateStatus(requestId, newStatus) {
-      const { error } = await supabase.from("cc_requests").update({ status: newStatus }).eq("id", requestId);
-      if (error) {
-        alert("Error updating status.");
-        console.error(error);
-      } else {
-        alert(`✅ Status updated to ${newStatus}`);
-      }
-    }
-  </script>
-</body>
-</html>
+{% block extra_js %}
+<script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+{% endblock %}

@@ -1,325 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Higher Studies Portal</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+{% extends 'shared/sidebar.html' %}
+{% load static %}
 
-        body {
-            display: flex;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
+{% block title %}HigherStudiesPortal | LOR Application{% endblock %}
 
-        /* Sidebar Styling */
-        .sidebar {
-            width: 250px;
-            background-color: #003C88; /* SSN Blue */
-            padding: 20px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+{% block additional_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/lor_application.css' %}" />
+{% endblock %}
 
-        .sidebar img {
-            width: 100%;
-            max-width: 200px;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .sidebar a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-        }
-
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 20px;
-        }
-
-        /* Header Bar */
-        .header {
-            width: 100%;
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .header .title {
-            font-size: 50px;
-            color: #003C88;
-            font-weight: bold;
-        }
-
-        /* Dropdown Button */
-        .dropbtn {
-            background-color: #0221cd;
-            color: white;
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            cursor: pointer;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .dropbtn:hover, .dropbtn:focus {
-            background-color: #0218a7;
-        }
-
-        /* Dropdown Content */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f6f6f6;
-            min-width: 230px;
-            border: 1px solid #ddd;
-            z-index: 1;
-        }
-
-        .dropdown-content input {
-            box-sizing: border-box;
-            font-size: 16px;
-            padding: 10px;
-            width: 100%;
-            border: none;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #ddd;
-        }
-
-        .show {
-            display: block;
-        }
-
-        /* Apply Button */
-        .apply-btn {
-            background-color: #003C88; /* SSN Blue */
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .apply-btn:hover {
-            background-color: #003C88;
-        }
-
-        .disabled {
-            color: #999;
-            pointer-events: none;
-        }
-    </style>
-</head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <img src="ssn.png" alt="SSN Logo">
-        <a href="#">LoR Tracking</a>
-    </div>
-
-    <!-- Main Content -->
+{% block page_content %}
     <div class="main-content">
         <div class="header">
-            <div class="title">Higher Studies Portal</div>
+            <h2 class="heading1">Letter of Recommendation Application</h2>
+            <span>{{ request.user.email }}</span>
         </div>
 
-        <form method="POST" action="{% url 'submit_lor_request' %}">
-            {% csrf_token %}
-            
-            <!-- Dropdown for Staff Selection -->
-            <div class="dropdown">
-                <button type="button" onclick="toggleDropdown(1)" class="dropbtn">
-                    Staff 1: Select Staff
-                </button>
-                <div id="dropdown1" class="dropdown-content">
-                    <input type="text" placeholder="Search.." onkeyup="filterFunction(1)" />
-                    {% for faculty in faculties %}
-                    <a href="#" onclick="selectStaff(this, 1, '{{ faculty.id }}')">{{ faculty.user.get_full_name }}</a>
-                    {% endfor %}
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
                 </div>
-            </div>
-            <input type="hidden" id="faculty1_id" name="faculty1_id" value="">
+            {% endfor %}
+        </div>
+        {% endif %}
 
-            <div class="dropdown">
-                <button type="button" onclick="toggleDropdown(2)" class="dropbtn">
-                    Staff 2: Select Staff
-                </button>
-                <div id="dropdown2" class="dropdown-content">
-                    <input type="text" placeholder="Search.." onkeyup="filterFunction(2)" />
-                    {% for faculty in faculties %}
-                    <a href="#" onclick="selectStaff(this, 2, '{{ faculty.id }}')">{{ faculty.user.get_full_name }}</a>
-                    {% endfor %}
-                </div>
-            </div>
-            <input type="hidden" id="faculty2_id" name="faculty2_id" value="">
-
-            <div class="dropdown">
-                <button type="button" onclick="toggleDropdown(3)" class="dropbtn">
-                    Staff 3: Select Staff
-                </button>
-                <div id="dropdown3" class="dropdown-content">
-                    <input type="text" placeholder="Search.." onkeyup="filterFunction(3)" />
-                    {% for faculty in faculties %}
-                    <a href="#" onclick="selectStaff(this, 3, '{{ faculty.id }}')">{{ faculty.user.get_full_name }}</a>
-                    {% endfor %}
-                </div>
-            </div>
-            <input type="hidden" id="faculty3_id" name="faculty3_id" value="">
-
-            <!-- Additional form fields -->
-            <div style="margin: 20px 0;">
-                <div style="margin-bottom: 15px;">
-                    <label for="university_name" style="display: block; margin-bottom: 5px;">University Name:</label>
-                    <input type="text" id="university_name" name="university_name" required style="padding: 8px; width: 300px;">
-                </div>
+        <div class="lor-form">
+            <form method="POST" action="{% url 'submit_lor_request' %}">
+                {% csrf_token %}
                 
-                <div style="margin-bottom: 15px;">
-                    <label for="program_name" style="display: block; margin-bottom: 5px;">Program Name:</label>
-                    <input type="text" id="program_name" name="program_name" required style="padding: 8px; width: 300px;">
-                </div>
-                
-                <div style="margin-bottom: 15px;">
-                    <label for="deadline" style="display: block; margin-bottom: 5px;">Application Deadline:</label>
-                    <input type="date" id="deadline" name="deadline" style="padding: 8px; width: 300px;">
-                </div>
-                
-                <div style="margin-bottom: 15px;">
-                    <label for="additional_notes" style="display: block; margin-bottom: 5px;">Additional Notes:</label>
-                    <textarea id="additional_notes" name="additional_notes" rows="4" style="padding: 8px; width: 300px;"></textarea>
-                </div>
-            </div>
+                <div class="form-section">
+                    <h3>Faculty Selection</h3>
+                    <p class="section-desc">Select up to two faculty members to request LOR from.</p>
+                    
+                    <div class="faculty-selection">
+                        <div class="dropdown">
+                            <button type="button" onclick="toggleDropdown(1)" class="dropbtn">
+                                Staff 1: Select Staff
+                            </button>
+                            <div id="dropdown1" class="dropdown-content">
+                                <input type="text" placeholder="Search faculty..." onkeyup="filterFunction(1)" />
+                                {% for faculty in faculties %}
+                                <a href="#" onclick="selectStaff(this, 1, '{{ faculty.id }}')">{{ faculty.user.get_full_name }}</a>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="faculty1_id" name="faculty1_id" value="">
+                        </div>
 
-            <button type="submit" class="apply-btn">Apply for LoR</button>
-        </form>
+                        <div class="dropdown">
+                            <button type="button" onclick="toggleDropdown(2)" class="dropbtn">
+                                Staff 2: Select Staff
+                            </button>
+                            <div id="dropdown2" class="dropdown-content">
+                                <input type="text" placeholder="Search faculty..." onkeyup="filterFunction(2)" />
+                                {% for faculty in faculties %}
+                                <a href="#" onclick="selectStaff(this, 2, '{{ faculty.id }}')">{{ faculty.user.get_full_name }}</a>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="faculty2_id" name="faculty2_id" value="">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>University Details</h3>
+                    <div class="input-group">
+                        <label for="university_name">University Name</label>
+                        <input type="text" id="university_name" name="university_name" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="program_name">Program Name</label>
+                        <input type="text" id="program_name" name="program_name" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="deadline">Application Deadline</label>
+                        <input type="date" id="deadline" name="deadline" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Additional Information</h3>
+                    <div class="input-group">
+                        <label for="additional_notes">Additional Notes (Optional)</label>
+                        <textarea id="additional_notes" name="additional_notes" placeholder="Any specific requirements or additional information for the faculty..."></textarea>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">Submit LOR Request</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
-        let selectedStaff = {
-            1: null,
-            2: null,
-            3: null,
-        };
-
-        function toggleDropdown(dropdownNum) {
-            closeAllDropdowns();
-            document
-                .getElementById("dropdown" + dropdownNum)
-                .classList.toggle("show");
+        function toggleDropdown(num) {
+            document.getElementById("dropdown" + num).classList.toggle("show");
         }
 
-        function closeAllDropdowns() {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            for (var i = 0; i < dropdowns.length; i++) {
-                dropdowns[i].classList.remove("show");
+        function filterFunction(num) {
+            var input, filter, div, a, i;
+            input = document.getElementById("dropdown" + num).getElementsByTagName("input")[0];
+            filter = input.value.toUpperCase();
+            div = document.getElementById("dropdown" + num);
+            a = div.getElementsByTagName("a");
+            for (i = 0; i < a.length; i++) {
+                txtValue = a[i].textContent || a[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
             }
         }
 
-        function filterFunction(dropdownNum) {
-            var input = document.querySelector(`#dropdown${dropdownNum} input`);
-            var filter = input.value.toUpperCase();
-            var div = document.getElementById("dropdown" + dropdownNum);
-            var a = div.getElementsByTagName("a");
-
-            for (var i = 0; i < a.length; i++) {
-                var txtValue = a[i].textContent || a[i].innerText;
-                a[i].style.display =
-                    txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
+        function selectStaff(element, num, id) {
+            var btnText = element.parentElement.parentElement.getElementsByTagName("button")[0];
+            btnText.textContent = element.textContent;
+            document.getElementById("faculty" + num + "_id").value = id;
+            document.getElementById("dropdown" + num).classList.remove("show");
         }
 
-        function selectStaff(element, dropdownNum, facultyId) {
-            const staffName = element.textContent;
-
-            // Update button text
-            document.querySelector(
-                `#dropdown${dropdownNum}`
-            ).previousElementSibling.textContent = `Staff ${dropdownNum}: ${staffName}`;
-
-            // Store selection and faculty ID
-            selectedStaff[dropdownNum] = staffName;
-            document.getElementById(`faculty${dropdownNum}_id`).value = facultyId;
-
-            // Close dropdown
-            document
-                .getElementById("dropdown" + dropdownNum)
-                .classList.remove("show");
-
-            // Update all dropdowns to disable selected staff
-            updateDropdowns();
-        }
-
-        function updateDropdowns() {
-            // Get all selected values
-            const selectedValues = Object.values(selectedStaff).filter(
-                (value) => value !== null
-            );
-
-            // Update each dropdown
-            for (let i = 1; i <= 3; i++) {
-                const links = document.querySelectorAll(`#dropdown${i} a`);
-                links.forEach((link) => {
-                    if (
-                        selectedValues.includes(link.textContent) &&
-                        link.textContent !== selectedStaff[i]
-                    ) {
-                        link.classList.add("disabled");
-                    } else {
-                        link.classList.remove("disabled");
+        // Close dropdowns when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
                     }
-                });
+                }
             }
         }
-
-        window.onclick = function (event) {
-            if (!event.target.matches(".dropbtn")) {
-                closeAllDropdowns();
-            }
-        };
     </script>
-</body>
-</html>
+{% endblock %}

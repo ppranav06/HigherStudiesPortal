@@ -100,15 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('program_name', programName);
         formData.append('admission_date', admissionDate);
         
-        // Add this line to include the CSRF token in the FormData
-        formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-        
-        // Add this after creating the FormData object
-        console.log("FormData contents:");
-        for (const pair of formData.entries()) {
-            console.log(pair[0] + ': ' + (pair[1] instanceof File ? pair[1].name + ' (' + pair[1].size + ' bytes)' : pair[1]));
-        }
-        
         // Get CSRF token
         const csrftoken = getCookie('csrftoken');
         
@@ -120,45 +111,31 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken
-                // Do NOT set Content-Type here - the browser will set it with the right boundary for multipart/form-data
             },
             body: formData
         })
         .then(response => {
-            console.log("Response status:", response.status);
-            return response.json().then(data => ({
-                status: response.status,
-                body: data
-            }));
-        })
-        .then(({status, body}) => {
-            if (status >= 400) {
-                throw new Error(body.error || "Upload failed");
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-            
-            // Show success message
-            uploadBtn.textContent = "Upload Complete!";
-            uploadBtn.style.backgroundColor = "#4CAF50";
-            
-            // Reset form after success
-            setTimeout(() => {
-                uploadBtn.textContent = "Upload Files";
-                uploadBtn.disabled = false;
-                uploadBtn.style.backgroundColor = ""; // Reset button color
-                
-                // Clear the form
-                admissionLetterInput.value = "";
-                universityNameInput.value = "";
-                programNameInput.value = "";
-                admissionDateInput.value = "";
-                checkAllFieldsValid(); // Re-validate form
-            }, 3000);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Upload successful!');
+                // Reset form or redirect as needed
+            } else {
+                throw new Error(data.error || 'Upload failed');
+            }
         })
         .catch(error => {
-            console.error("Upload error:", error);
-            errorAdmission.textContent = "Upload failed: " + error.message;
-            uploadBtn.textContent = "Upload Files";
+            console.error('Error:', error);
+            errorAdmission.textContent = error.message || 'An error occurred during upload';
+        })
+        .finally(() => {
+            // Reset button state
             uploadBtn.disabled = false;
+            uploadBtn.textContent = "Upload Files";
         });
     });
     

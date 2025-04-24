@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,13 +10,17 @@
     <title>
         {% block title %} HigherStudiesPortal {% endblock %}
     </title>
-    <!-- Link your custom css/js in this block -->
-    {% block head %}
-    {% endblock %}
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="{% static 'css/common_css.css' %}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Additional CSS -->
+    {% block additional_css %}{% endblock %}
 </head>
 <body>
     {% block content %}
     <p>Placeholder content</p>
     {% endblock %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

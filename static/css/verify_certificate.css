@@ -1,0 +1,110 @@
+.requests-container {
+    display: grid;
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.verification-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.student-info {
+    margin-bottom: 1rem;
+}
+
+.student-info h3 {
+    color: #003C88;
+    margin: 0 0 0.5rem 0;
+}
+
+.student-info p {
+    color: #666;
+    margin: 0.25rem 0;
+}
+
+.document-preview {
+    margin: 1rem 0;
+}
+
+.verification-form {
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #444;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: #444;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+} 
