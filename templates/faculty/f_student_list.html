@@ -39,13 +39,13 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Register Number</th>
+                    <!-- <th>Register Number</th> -->
                     <th>Department</th>
-                    <th>Section</th>
-                    <th>Year</th>
-                    <th>Year of Passing</th>
-                    <th>Digital ID</th>
-                    <th>Phone Number</th>
+                    <!-- <th>Section</th> -->
+                    <!-- <th>Year</th> -->
+                    <!-- <th>Year of Passing</th> -->
+                    <!-- <th>Digital ID</th> -->
+                    <!-- <th>Phone Number</th> -->
                     <th>Email ID</th>
                 </tr>
             </thead>
@@ -53,13 +53,13 @@
                 {% for student in students %}
                 <tr>
                     <td>{{ student.user.first_name }} {{ student.user.last_name }}</td>
-                    <td>{{ student.register_number }}</td>
+                    <!-- <td>{{ student.register_number }}</td> -->
                     <td>{{ student.department }}</td>
-                    <td>{{ student.section }}</td>
-                    <td>{{ student.year }}</td>
-                    <td>{{ student.year_of_passing }}</td>
-                    <td>{{ student.digital_id }}</td>
-                    <td>{{ student.phone_number }}</td>
+                    <!-- <td>{{ student.section }}</td> -->
+                    <!-- <td>{{ student.year }}</td> -->
+                    <!-- <td>{{ student.year_of_passing }}</td> -->
+                    <!-- <td>{{ student.digital_id }}</td> -->
+                    <!-- <td>{{ student.phone_number }}</td> -->
                     <td>{{ student.user.email }}</td>
                 </tr>
                 {% empty %}
