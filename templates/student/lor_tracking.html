@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block title %}HigherStudiesPortal | LoR Tracking {% endblock %}
-{% block head %}
-    <link rel="stylesheet" href="{% static 'css/common_css.css' %}" />
+{% block additional_css %}
+    {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/lor_tracking.css' %}" />
 {% endblock %}
 
