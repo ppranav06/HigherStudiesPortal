@@ -38,7 +38,7 @@
         }
 
         .pending { background-color: orange; }
-        .approved { background-color: green; }
+        .verified { background-color: green; }
         .rejected { background-color: red; }
 
         select {
@@ -83,7 +83,7 @@
                     <td>
                         <select>
                             <option value="Pending" {% if request.status == 'Pending' %}selected{% endif %}>Pending</option>
-                            <option value="Approved" {% if request.status == 'Approved' %}selected{% endif %}>Approved</option>
+                            <option value="Verified" {% if request.status == 'Verified' %}selected{% endif %}>Verified</option>
                             <option value="Rejected" {% if request.status == 'Rejected' %}selected{% endif %}>Rejected</option>
                         </select>
                         <button onclick="updateStatus(this)">Update</button>
