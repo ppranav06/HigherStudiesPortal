@@ -38,7 +38,7 @@
         }
 
         .pending { background-color: orange; }
-        .verified { background-color: green; }
+        .approved { background-color: green; }
         .rejected { background-color: red; }
 
         select {
@@ -77,13 +77,13 @@
             <tbody id="lorRequests">
                 {% for request in lor_requests %}
                 <tr data-request-id="{{ request.id }}">
-                    <td>{{ request.student.user.first_name }} {{ request.student.user.last_name }}</td>
-                    <td>{{ request.student.register_number }}</td>
+                    <td>{{ request.student_name }}</td>
+                    <td>{{ request.student_id }}</td>
                     <td><span class="status {{ request.status|lower }}">{{ request.status }}</span></td>
                     <td>
                         <select>
                             <option value="Pending" {% if request.status == 'Pending' %}selected{% endif %}>Pending</option>
-                            <option value="Verified" {% if request.status == 'Verified' %}selected{% endif %}>Verified</option>
+                            <option value="Approved" {% if request.status == 'Approved' %}selected{% endif %}>Approved</option>
                             <option value="Rejected" {% if request.status == 'Rejected' %}selected{% endif %}>Rejected</option>
                         </select>
                         <button onclick="updateStatus(this)">Update</button>

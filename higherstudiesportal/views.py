@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.db import models # for join query equivalents in django's ORM
 from django.http import JsonResponse, HttpResponse
 from django.core.exceptions import PermissionDenied
 
@@ -19,7 +20,6 @@ from .utils.binomial_heap import BinomialHeap  # adjust import if needed
 from .utils.supabase_auth import get_supabase_client
 
 def index(request):
-    return render(request, 'index.html')
     # return render(request, 'index.html') # problem for later, need to add index
     return redirect('/login')
 
@@ -122,8 +122,42 @@ def f_student_list(request):
 @login_required
 @user_passes_test(is_faculty)
 def approveLOR(request):
-    # Get all LOR requests associated with students
-    lor_requests = RecommendationRequest.objects.select_related('student', 'student__user').all()
+    """View to approve or reject LOR requests"""
+    
+    # Get the faculty user
+    faculty = Faculty.objects.get(user=request.user)
+    
+    # Using raw SQL-like query with Django ORM to match your requested join pattern ('F' from django.db.models)
+    lor_requests = RecommendationRequest.objects.filter(
+        faculty=faculty
+    ).select_related(
+        'student', 
+        'student__user'
+    ).annotate(
+        student_name=models.functions.Concat(
+            models.F('student__user__first_name'), 
+            models.Value(' '), 
+            models.F('student__user__last_name'),
+            output_field=models.CharField()
+        )
+    ).values(
+        'id',
+        'student_id',
+        'student_name',
+        'status'
+    ).order_by('-created_at')
+    
+    # This approximates the SQL query:
+    #   SELECT CONCAT(a.first_name||' '||a.last_name) as student_name, 
+    #          lor.student_id as student_id, 
+    #          lor.status as status 
+    #   FROM higherstudiesportal_recommendationrequest lor
+    #   JOIN higherstudiesportal_student s on s.id=lor.student_id
+    #   JOIN auth_user a on a.id=s.user_Id;
+    #   WHERE lor.faculty_id = faculty.id
+    #   ORDER BY lor.created_at DESC;
+
+    print(lor_requests)
     return render(request, 'faculty/f_verify.html', {'lor_requests': lor_requests})
 
 @login_required
@@ -327,48 +361,55 @@ def submit_lor_request(request):
             # Get the student object
             student = Student.objects.get(user=request.user)
             
-            # Create LOR requests for each selected faculty
-            for i in range(1, 4):  # For staff 1, 2, 3
-                faculty_id = request.POST.get(f'faculty{i}_id')
+            # Extract common form data
+            university_name = request.POST.get('university_name')
+            program_name = request.POST.get('program_name')
+            deadline = request.POST.get('deadline')
+            additional_notes = request.POST.get('additional_notes', '')
+            
+            # Get all faculty IDs from the POST data
+            faculty_ids = []
+            for key in request.POST:
+                if key.startswith('faculty') and key.endswith('_id') and request.POST[key]:
+                    faculty_ids.append(request.POST[key])
+            
+            if not faculty_ids:
+                messages.warning(request, "Please select at least one faculty member.")
+                return redirect('student_lor')
+            
+            # Process each selected faculty
+            for faculty_id in faculty_ids:
+                try:
+                    faculty = Faculty.objects.get(id=faculty_id)
+                    
+                    # Check if a request already exists for this student-faculty pair
+                    from .models import RecommendationRequest
+                    existing_request = RecommendationRequest.objects.filter(
+                        student=student,
+                        faculty=faculty,
+                        status__in=['pending', 'approved']
+                    ).exists()
+                    
+                    if existing_request:
+                        messages.warning(request, f"You already have an active LOR request with {faculty.user.get_full_name()}")
+                        continue
+                    
+                    # Create the recommendation request
+                    RecommendationRequest.objects.create(
+                        student=student,
+                        faculty=faculty,
+                        status='pending',
+                        university_name=university_name,
+                        program_name=program_name,
+                        deadline=deadline if deadline else None,
+                        additional_notes=additional_notes
+                    )
+                    
+                    messages.success(request, f"LOR request submitted to {faculty.user.get_full_name()}")
                 
-                if faculty_id:  # Only process if faculty was selected
-                    try:
-                        faculty = Faculty.objects.get(id=faculty_id)
-                        
-                        # Check if a request already exists for this student-faculty pair
-                        from .models import RecommendationRequest
-                        existing_request = RecommendationRequest.objects.filter(
-                            student=student,
-                            faculty=faculty,
-                            status__in=['pending', 'approved']
-                        ).exists()
-                        
-                        if existing_request:
-                            messages.warning(request, f"You already have an active LOR request with {faculty.user.get_full_name()}")
-                            continue
-                        
-                        # Get common form data
-                        university_name = request.POST.get('university_name')
-                        program_name = request.POST.get('program_name')
-                        deadline = request.POST.get('deadline')
-                        additional_notes = request.POST.get('additional_notes', '')
-                        
-                        # Create the recommendation request
-                        RecommendationRequest.objects.create(
-                            student=student,
-                            faculty=faculty,
-                            status='pending',
-                            university_name=university_name,
-                            program_name=program_name,
-                            deadline=deadline if deadline else None,
-                            additional_notes=additional_notes
-                        )
-                        
-                        messages.success(request, f"LOR request submitted to {faculty.user.get_full_name()}")
-                    
-                    except Faculty.DoesNotExist:
-                        messages.error(request, f"Selected faculty {faculty_id} not found")
-                    
+                except Faculty.DoesNotExist:
+                    messages.error(request, f"Selected faculty (ID: {faculty_id}) not found")
+                
             return redirect('lor-tracking')
             
         except Student.DoesNotExist:
