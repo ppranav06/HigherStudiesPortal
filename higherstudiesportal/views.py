@@ -1,3 +1,4 @@
+from django.conf import settings # use lazy import for settings (more aligned with other code)
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -12,7 +13,6 @@ import logging
 import json
 from datetime import datetime
 
-from backend.settings import SUPABASE_BUCKET_NAME
 from .models import Student, Faculty, RecommendationRequest
 from .utils.supabase_auth import determine_role_from_email, register_user, get_supabase_uuid
 from .utils.supabase_storage import upload_file_to_bucket
@@ -337,7 +337,7 @@ def upload_admission_letter(request):
         
         responseFromUploadFile = upload_file_to_bucket(
             file_object=file,
-            bucket_name=SUPABASE_BUCKET_NAME,
+            bucket_name=settings.SUPABASE_BUCKET_NAME,
             record_id=record_id,
             student_id=student_id,
             university_name=university_name,
