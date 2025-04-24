@@ -20,6 +20,8 @@ from .utils.supabase_auth import get_supabase_client
 
 def index(request):
     return render(request, 'index.html')
+    # return render(request, 'index.html') # problem for later, need to add index
+    return redirect('/login')
 
 ######################################################################
 # Validation functions
