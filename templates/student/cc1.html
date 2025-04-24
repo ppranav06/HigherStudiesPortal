@@ -3,39 +3,38 @@
 
 {% block title %}HigherStudiesPortal | Upload Admission Letter {% endblock %}
 {% block head %}
-    <link rel= "stylesheet" href="{% static 'css/common_css.css' %}" />
-    <link rel= "stylesheet" href="{% static 'css/cc1.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common_css.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/cc1.css' %}" />
     <script src="{% static 'js/cc1.js' %}"></script>
 {% endblock %}
 
 {% block page_content %}
     <!-- Main Content -->
     <div class="upload-container">
-        {% csrf_token %}
-        <h2>Upload Documents</h2>
+        <form id="admissionForm" enctype="multipart/form-data" method="POST" action="/upload_admission_letter/">
+            {% csrf_token %}
+            <h2>Upload Documents</h2>
+            
+            <div class="input-group">
+                <label for="university_name">University Name</label>
+                <input type="text" id="university_name" name="university_name" required>
+            </div>
         
-        <!-- <label>Admit Card (PDF, Max 2MB)</label>
-        <input type="file" id="admitCard" class="file-input" accept=".pdf">
-        <div id="errorAdmit" class="error"></div> -->
-        <div class="input-group">
-            <label for="university_name">Univesity Name</label>
-            <input type="text" id="university_name" name="university_name" required>
-        </div>
-    
-        <div class="input-group">
-            <label for="program_name">Program Name</label>
-            <input type="text" id="program_name" name="program_name" required>
-        </div>
-    
-        <div class="input-group">
-            <label for="admission_date">Admission Date</label>
-            <input type="date" id="admission_date" name="admission_date" required>
-        </div>
-    
-        <label>Admission Letter (PDF, Max 2MB)</label>
-        <input type="file" id="admissionLetter" class="file-input" accept=".pdf">
-        <div id="errorAdmission" class="error"></div>
-    
-        <button id="uploadBtn" class="upload-btn" disabled>Upload Files</button>
+            <div class="input-group">
+                <label for="program_name">Program Name</label>
+                <input type="text" id="program_name" name="program_name" required>
+            </div>
+        
+            <div class="input-group">
+                <label for="admission_date">Admission Date</label>
+                <input type="date" id="admission_date" name="admission_date" required>
+            </div>
+        
+            <label>Admission Letter (PDF, Max 2MB)</label>
+            <input type="file" id="admissionLetter" name="admission_letter" class="file-input" accept=".pdf">
+            <div id="errorAdmission" class="error"></div>
+        
+            <button type="button" id="uploadBtn" class="upload-btn" disabled>Upload Files</button>
+        </form>
     </div>
 {% endblock %}

@@ -4,19 +4,19 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core.exceptions import PermissionDenied
 
 import logging
 import json
+from datetime import datetime
 
+from backend.settings import SUPABASE_BUCKET_NAME
 from .models import Student, Faculty, RecommendationRequest
 from .utils.supabase_auth import determine_role_from_email, register_user, get_supabase_uuid
 from .utils.supabase_storage import upload_file_to_bucket
-
 from .utils.binomial_heap import BinomialHeap  # adjust import if needed
-from .utils.supabase_auth import supabase
-from datetime import datetime
+from .utils.supabase_auth import get_supabase_client
 
 def index(request):
     return render(request, 'index.html')
@@ -243,46 +243,74 @@ logger = logging.getLogger(__name__)
 def upload_admission_letter(request):
     user = request.user
     try:
-        student = Student.objects.get(user=user)  # Assuming you have a Student model linked to the user
+        student = Student.objects.get(user=user)
         
         # Get current user
-        student_id = get_supabase_uuid(django_user=user) # Getting the supabase UUID from the Django user object
+        student_id = get_supabase_uuid(django_user=user)
+        
+        # Log the incoming request data for debugging
+        logger.info(f"Received form data: {dict(request.POST)}")
+        logger.info(f"Files: {dict(request.FILES)}")
         
         # Extract file from request
         if 'admission_letter' not in request.FILES:
+            logger.error("No file provided in request")
             return JsonResponse({"error": "No file provided"}, status=400)
         
         file = request.FILES['admission_letter']
         
         # Validate file type
         if not file.name.endswith('.pdf'):
+            logger.error(f"Invalid file type: {file.name}")
             return JsonResponse({"error": "Only PDF files are allowed"}, status=400)
+        
+        # Extract form data with defaults to avoid None values
+        university_name = request.POST.get('university_name', '')
+        if university_name:
+            university_name = university_name.strip()
+        
+        program_name = request.POST.get('program_name', '')
+        if program_name:
+            program_name = program_name.strip()
+        
+        admission_date = request.POST.get('admission_date', '')
+        if admission_date:
+            admission_date = admission_date.strip()
+        
+        # Log the specific values we're trying to use
+        logger.info(f"University name: '{university_name}'")
+        logger.info(f"Program name: '{program_name}'")
+        logger.info(f"Admission date: '{admission_date}'")
+        
+        # Validate required fields with detailed logging
+        if not university_name:
+            logger.error("Missing university name")
+            return JsonResponse({"error": "University name is required"}, status=400)
+        
+        if not program_name:
+            logger.error("Missing program name")
+            return JsonResponse({"error": "Program name is required"}, status=400)
+        
+        if not admission_date:
+            logger.error("Missing admission date")
+            return JsonResponse({"error": "Admission date is required"}, status=400)
+        
         record_id = request.POST.get('record_id')
-               
-        upload_file_to_bucket(file_object=file,
-                              bucket_name='admission_letters',
-                              record_id=record_id,
-                              student_id=student_id,
-                              university_name=request.POST.get('university_name'),
-                              program_name=request.POST.get('program_name'),
-                              admission_date=request.POST.get('admission_date'),
-                              logger=logger
-                              )
+
+        logger.info(f"All validations passed, calling upload_file_to_bucket with: university_name={university_name}, program_name={program_name}, admission_date={admission_date}")
         
-        # Update the admission_records table with the file path
-        # Note: This assumes the user is already creating or has created an admission record
-        # You may need to adjust this logic based on your application flow
+        responseFromUploadFile = upload_file_to_bucket(
+            file_object=file,
+            bucket_name=SUPABASE_BUCKET_NAME,
+            record_id=record_id,
+            student_id=student_id,
+            university_name=university_name,
+            program_name=program_name,
+            admission_date=admission_date,
+            logger=logger
+        )
         
-        # Option 1: If creating a new record along with the upload
-        # db_response = supabase.table('admission_records').insert({
-        #     'student_id': student_id,
-        #     'university_name': request.POST.get('university_name', ''),  # You might want to get these values from the form
-        #     'program_name': request.POST.get('program_name', ''),
-        #     'letter_file_path': file_path
-        # }).execute()
-        
-        # Option 2: If updating an existing record
-        # Get the record ID from the request if available
+        return responseFromUploadFile
 
     except Exception as e:
         logger.exception(f"Error in upload_admission_letter: {str(e)}")
@@ -351,6 +379,7 @@ def submit_lor_request(request):
 
 # binomial heap
 def prioritized_requests(request):
+    supabase = get_supabase_client()
     response = supabase.table("admission_records").select("*").execute()
     requests = response.data
 

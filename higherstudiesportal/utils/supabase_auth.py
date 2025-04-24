@@ -16,12 +16,16 @@ import re
 
 getURLKEY = lambda: (os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_ANON_KEY'))
 
+def get_supabase_client():
+    """Creates the client and returns the client object"""
+    load_dotenv('.env')
+    URL, KEY = getURLKEY()
+    supabase = create_client(supabase_url=URL, supabase_key=KEY)
+    return supabase
+
 class SupabaseAuthBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
-        load_dotenv('.env')
-        URL, KEY = getURLKEY()
-        print(URL, KEY)
-        supabase = create_client(supabase_url=URL, supabase_key=KEY)
+        supabase = get_supabase_client()
         try:
             response = supabase.auth.sign_in_with_password(
                 {
