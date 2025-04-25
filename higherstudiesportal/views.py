@@ -130,8 +130,31 @@ def dashboard_student(request):
 def verification_tracking_student(request):
     try:
         student = Student.objects.get(user=request.user)
-        certificates = AdmissionRecord.objects.filter(student=student).order_by('-created_at')
-        print(certificates)
+        # Raw SQL approach (with connection) (am I dumb???)
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT a.id, a.university_name, a.program_name, a.admission_date, 
+                       cc.status, a.created_at 
+                FROM higherstudiesportal_admissionrecord a
+                JOIN higherstudiesportal_coursecompletionrequest cc 
+                    ON cc.student_id = a.student_id
+                WHERE a.student_id = %s
+                ORDER BY a.created_at DESC
+            """, [student.id])
+            
+            certificates = [
+                {
+                    'id': row[0],
+                    'university_name': row[1],
+                    'program_name': row[2],
+                    'admission_date': row[3],
+                    'status': row[4],
+                    'created_at': row[5]
+                }
+                for row in cursor.fetchall()
+            ]
+        
         return render(request, 'student/cc_verification.html', {'certificates': certificates})
     except Student.DoesNotExist:
         messages.error(request, "Student profile not found")

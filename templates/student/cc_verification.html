@@ -30,8 +30,8 @@
                             <td>{{ cert.program_name }}</td>
                             <td>{{ cert.admission_date|default:"Not specified" }}</td>
                             <td>
-                                <span class="status-badge {% if cert.letter_file_path %}verified{% else %}pending{% endif %}">
-                                    {% if cert.letter_file_path %}Verified{% else %}Pending{% endif %}
+                                <span class="status-badge {{cert.status}}">
+                                   {{cert.status}} 
                                 </span>
                             </td>
                             <td>{{ cert.created_at|date:"F j, Y" }}</td>
