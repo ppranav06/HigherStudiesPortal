@@ -131,6 +131,7 @@ def verification_tracking_student(request):
     try:
         student = Student.objects.get(user=request.user)
         certificates = AdmissionRecord.objects.filter(student=student).order_by('-created_at')
+        print(certificates)
         return render(request, 'student/cc_verification.html', {'certificates': certificates})
     except Student.DoesNotExist:
         messages.error(request, "Student profile not found")
@@ -349,7 +350,9 @@ def upload_admission_letter(request):
         student = Student.objects.get(user=user)
         
         # Get current user
-        student_id = get_supabase_uuid(django_user=user)
+        student_id = student.id
+        # Get UUID from Supabase (auth)
+        student_uuid = get_supabase_uuid(django_user=user)
         
         # Log the incoming request data for debugging
         logger.info(f"Received form data: {dict(request.POST)}")
@@ -407,6 +410,7 @@ def upload_admission_letter(request):
             bucket_name=settings.SUPABASE_BUCKET_NAME,
             record_id=record_id,
             student_id=student_id,
+            student_uuid=student_uuid,
             university_name=university_name,
             program_name=program_name,
             admission_date=admission_date,

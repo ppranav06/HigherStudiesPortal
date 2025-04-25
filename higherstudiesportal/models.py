@@ -60,7 +60,7 @@ class AdmissionRecord(models.Model):
 
 class CourseCompletionRequest(models.Model):
     student = models.ForeignKey('Student', on_delete=models.CASCADE)
-    certificate_file = models.FileField(upload_to='course_certificates/')
+    certificate_file = models.FileField(upload_to='admission_records/')
     status = models.CharField(max_length=20, choices=[
         ('Pending', 'Pending'),
         ('Verified', 'Verified'),
