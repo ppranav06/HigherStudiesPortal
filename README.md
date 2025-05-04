@@ -1,12 +1,18 @@
-# React + Vite
+# HigherStudiesPortal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HigherStudiesPortal is written with the intent of tracking students pursuing higher studies for a college/university. 
 
-Currently, two official plugins are available:
+## Main Deliverables
+1. Track requests for Letters of Recommendation 
+> Here, students pursuing higher studies will request letters of recommendation from three faculties in a department. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+2. Upload admission letter to database
+> In the intent of keeping track of which students pursue which university, a file storage feature is included. Subsequent record handling is also done. 
 
-## Expanding the ESLint configuration
+## Tech Stack 
+- **Frontend**: HTML/CSS
+- **Backend**: Django 
+- **Database**: Supabase (postgres)
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Contributions
+Many thanks to Poornima, Praveen Nandan and Praveen Rathinam for contributing to this semester (4) project. 
