@@ -12,7 +12,7 @@ from higherstudiesportal.utils.supabase_auth import get_supabase_client
 
 def check_and_fix_admin():
     load_dotenv()
-    email = "poornima2310587@ssn.edu.in"
+    email = os.environ.get('ADMIN_EMAIL')
     
     # Check Django user
     try:

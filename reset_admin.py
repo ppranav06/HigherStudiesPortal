@@ -21,9 +21,9 @@ def reset_admin():
     print(f"URL: {url}")
     print(f"Key exists: {bool(key)}")
     
-    email = "poornima2310587@ssn.edu.in"
-    password = "hello123"
-    full_name = "Poornima"
+    email = os.getenv("ADMIN_EMAIL")
+    password = os.getenv("ADMIN_DEFAULT_PASSWORD")
+    full_name = os.getenv("ADMIN_FULL_NAME")
     
     # First, clean up any existing Django user
     try:

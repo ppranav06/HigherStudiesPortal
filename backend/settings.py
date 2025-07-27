@@ -16,20 +16,21 @@ import os
 from django.apps import apps
 from django.db.models.signals import post_migrate
 
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Setting up environment variables
+env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(env_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-bbk8$)cua$c2$xxsxik8(wmw2#q#&s-7194679x^du(0!s4=b0'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -163,10 +164,18 @@ STATICFILES_DIRS=[
 # Login and logout redirection 
 LOGIN_REDIRECT_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/login/'
+
 # Session settings
 SESSION_COOKIE_AGE = 1209600  # Two weeks, in seconds
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# CSRF settings
-CSRF_COOKIE_SECURE = True
 # CSRF_COOKIE_HTTPONLY = True
 # CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Settings for production (HTTPS)
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000  # One year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
