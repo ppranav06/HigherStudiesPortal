@@ -202,3 +202,5 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+/higherstudiesportal/migrations/__pycache__
